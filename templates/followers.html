@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Followers</title>
+</head>
+<body>
+
+<h1>Followers</h1>
+
+{% for user in followers %}
+
+<p>
+    <a href="/user/{{ user[0] }}">
+        {{ user[1] }}
+    </a>
+</p>
+
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inbox</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-4">
+
+    <div class="card shadow p-4">
+
+        <h2>💬 Chats</h2>
+
+        <hr>
+
+        {% if chats %}
+
+            {% for chat in chats %}
+
+            <div class="card mb-2">
+                <div class="card-body">
+
+                    <h5>
+                        👤 {{ chat[1] }}
+                    </h5>
+
+                    <a href="/chat/{{ chat[0] }}"
+                       class="btn btn-primary btn-sm">
+                        Open Chat
+                    </a>
+
+                </div>
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="alert alert-warning">
+                No chats yet.
+            </div>
+
+        {% endif %}
+
+        <a href="/dashboard"
+           class="btn btn-secondary mt-3">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
