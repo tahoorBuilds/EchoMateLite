@@ -20,8 +20,8 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 try:
     db = mysql.connector.connect(
         host="localhost",
-        user="root",
-        password="",
+        user="echo",
+        password="echo123",
         database="echomatelite"
     )
     cursor = db.cursor(buffered=True)
@@ -222,6 +222,8 @@ def login():
         print("PASSWORD =", password)
 
         try:
+
+            db.ping(reconnect=True, attempts=3, delay=2)
 
             sql = "SELECT * FROM users WHERE email=%s"
             values = (email,)
@@ -1144,4 +1146,4 @@ def deletemessage(message_id, user_id):
     return redirect(f"/chat/{user_id}")
 
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=8000)
+    app.run(debug=True, host="0.0.0.0", port=8000)
