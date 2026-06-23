@@ -3,6 +3,7 @@ import mysql.connector
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = "echomatelite_secret_key"
@@ -198,8 +199,10 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
 
+        hashed_password = generate_password_hash(password)
+
         sql = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-        values = (username, email, password)
+        values = (username, email, hashed_password)
 
         cursor.execute(sql, values)
         db.commit()
@@ -238,7 +241,7 @@ def login():
 
                 print("DATABASE PASSWORD =", user[3])
 
-                if password == user[3]:
+                if check_password_hash(user[3], password):
 
                     session['user_id'] = user[0]
                     session['username'] = user[1]
