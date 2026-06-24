@@ -46,7 +46,7 @@ body{
     src="{{ url_for('static', filename='profile_pics/' + user[1]) }}"
     width="120"
     height="120"
-    class="rounded-circle profile-pic mx-auto mb-3"
+    class="rounded-circle profile-pic mx-auto mb-3">
     {% endif %}
 
     <h2>Welcome {{ user[0] }} 👋</h2>
@@ -84,43 +84,43 @@ body{
             ✍️ Create Post
         </a>
 
-        <a href="/feed" class="btn btn-success btn-lg">
+        <a href="/feed" class="btn btn-success btn-lg menu-btn">
             📰 View Feed
         </a>
 
-        <a href="/profile" class="btn btn-info btn-lg">
+        <a href="/profile" class="btn btn-info btn-lg menu-btn">
             👤 My Profile
         </a>
 
-        <a href="/searchuser" class="btn btn-warning btn-lg">
+        <a href="/searchuser" class="btn btn-warning btn-lg menu-btn">
             🔍 Search User
         </a>
 
-        <a href="/searchpost" class="btn btn-info btn-lg">
+        <a href="/searchpost" class="btn btn-info btn-lg menu-btn">
             🔎 Search Posts
         </a>
 
-        <a href="/followers" class="btn btn-secondary btn-lg">
+        <a href="/followers" class="btn btn-secondary btn-lg menu-btn">
             👥 Followers
         </a>
 
-        <a href="/following" class="btn btn-dark btn-lg">
+        <a href="/following" class="btn btn-dark btn-lg menu-btn">
             ➕ Following
         </a>
 
-        <a href="/notifications" class="btn btn-danger btn-lg">
+        <a href="/notifications" class="btn btn-danger btn-lg menu-btn">
             🔔 Notifications {{ notification_count }}
         </a>
 
-        <a href="/admin" class="btn btn-dark btn-lg">
+        <a href="/admin" class="btn btn-dark btn-lg menu-btn">
             📊 Admin Dashboard
         </a>
 
-        <a href="/logout" class="btn btn-outline-danger btn-lg">
+        <a href="/logout" class="btn btn-outline-danger btn-lg menu-btn">
             🚪 Logout
         </a>
 
-        <a href="/inbox" class="btn btn-primary btn-lg">
+        <a href="/inbox" class="btn btn-primary btn-lg menu-btn">
             💬 Inbox
         </a>
 
