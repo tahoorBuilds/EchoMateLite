@@ -56,7 +56,7 @@ body{
             src="{{ url_for('static', filename='profile_pics/' + user[1]) }}"
             width="150"
             height="150"
-            class="rounded-circle profile-pic mb-3"
+            class="rounded-circle profile-pic mb-3">
 
         {% endif %}
 
@@ -106,13 +106,13 @@ body{
                 <p>{{ post[1] }}</p>
 
                 <a href="/editpost/{{ post[0] }}"
-                   class="btn btn-warning action-btn"
-                    Edit
+                   class="btn btn-warning action-btn">
+                   ✏️ Edit
                 </a>
 
                 <a href="/deletepost/{{ post[0] }}"
-                   class="btn btn-danger action-btn"
-                    Delete
+                   class="btn btn-danger action-btn">
+                   🗑️ Delete
                 </a>
 
             </div>
