@@ -199,10 +199,10 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
 
-        hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(password, method="pbkdf2:sha256")
 
         sql = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-        values = (username, email, hashed_password)
+        values = (username, email, password)
 
         cursor.execute(sql, values)
         db.commit()
@@ -241,7 +241,7 @@ def login():
 
                 print("DATABASE PASSWORD =", user[3])
 
-                if check_password_hash(user[3], password):
+                if password == user[3]:
 
                     session['user_id'] = user[0]
                     session['username'] = user[1]
