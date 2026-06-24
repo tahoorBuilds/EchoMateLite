@@ -1,12 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <style>
+body{
+    background: linear-gradient(
+        135deg,
+        #dbeafe,
+        #eff6ff,
+        #f8fafc
+    );
+    min-height:100vh;
+}
+
+.main-card{
+    border:none;
+    border-radius:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.app-btn{
+    border-radius:50px;
+}
+
+.menu-btn{
+    border-radius:50px;
+}
+
+.stat-blue{
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:20px;
+}
+
+.stat-green{
+    background:#16a34a;
+    color:white;
+    border:none;
+    border-radius:20px;
+}
+
+.stat-yellow{
+    background:#facc15;
+    color:black;
+    border:none;
+    border-radius:20px;
+}
+</style>
+    
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Following</title>
 </head>
 <body>
+<nav class="navbar navbar-dark bg-primary shadow-sm">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">
+            🚀 EchoMateLite
+        </span>
+    </div>
+</nav>
 
-<h1>Following</h1>
+    <h1>Following</h1>
 
 {% for user in following %}
 
