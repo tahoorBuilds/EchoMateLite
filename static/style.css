@@ -1,0 +1,189 @@
+/* EchoMateLite shared styles */
+:root {
+  --bg-dark: #0b1120;
+  --bg-soft: #0f1b38;
+  --bg-panel: #ffffff;
+  --text-primary: #0f172a;
+  --text-muted: #475569;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --border: rgba(15, 23, 42, 0.08);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 24%),
+              radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.22), transparent 20%),
+              linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+  color: var(--text-primary);
+}
+
+.container-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.25rem;
+}
+
+.hero-card,
+.auth-card {
+  width: min(100%, 560px);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.08);
+}
+
+.hero-card {
+  padding: 3rem;
+}
+
+.auth-card {
+  padding: 2.5rem;
+}
+
+.brand-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.brand-mark {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #2563eb, #7dd3fc);
+  color: #fff;
+  font-size: 1.35rem;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
+}
+
+.brand-title {
+  font-size: clamp(2rem, 2.6vw, 3rem);
+  font-weight: 800;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.brand-subtitle {
+  margin: 0.75rem 0 1.75rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+  max-width: 40rem;
+}
+
+.cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.cta-group .btn {
+  min-width: 140px;
+  border-radius: 999px;
+  padding: 0.85rem 1.5rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #7dd3fc);
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.cta-group .btn:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+}
+
+.btn-secondary {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: rgba(15, 23, 42, 0.1);
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.feature-list {
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.95rem 1rem;
+  background: #f8fbff;
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: 18px;
+}
+
+.feature-item span {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+
+.auth-card h1 {
+  margin-bottom: 1rem;
+}
+
+.auth-card .form-label {
+  font-weight: 600;
+}
+
+.auth-card .form-control,
+.auth-card .form-select,
+.auth-card .form-control:focus {
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  box-shadow: none;
+}
+
+.auth-card .btn-primary {
+  border-radius: 999px;
+  padding: 0.9rem 1.25rem;
+  font-weight: 700;
+}
+
+.auth-card .aux-link {
+  color: #64748b;
+  text-decoration: none;
+}
+
+.auth-card .aux-link:hover {
+  color: #2563eb;
+}
+
+footer.page-note {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #64748b;
+  font-size: 0.95rem;
+}

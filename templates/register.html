@@ -1,25 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Register</title>
+    <title>Register | EchoMateLite</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>Create Account</h1>
+<div class="container-hero">
+  <div class="auth-card">
+    <div class="brand-header">
+      <div class="brand-mark">E</div>
+      <div>
+        <h1 class="brand-title">EchoMateLite</h1>
+        <p class="brand-subtitle">Create your account and start sharing updates with your community.</p>
+      </div>
+    </div>
 
-<form method="POST">
-
-  <input type="text" name="username" placeholder="Username" required>
-
-<input type="email" name="email" placeholder="Email" required>
-
-<input type="password" name="password" placeholder="Password" required>
-
-    <button type="submit">Register</button>
-
-</form>
+    <h1>Register</h1>
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" placeholder="Username" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" placeholder="Email" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
+    <p class="page-note">Already have an account? <a href="/login" class="aux-link">Login</a></p>
+  </div>
+</div>
 
 </body>
 </html>
-<p>TEST FORM</p>

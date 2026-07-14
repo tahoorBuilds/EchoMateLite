@@ -3,20 +3,32 @@
 <head>
     <title>EchoMateLite</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <h1>EchoMateLite</h1>
+<div class="container-hero">
+  <div class="hero-card">
+    <div class="brand-header">
+      <div class="brand-mark">E</div>
+      <div>
+        <h1 class="brand-title">EchoMateLite</h1>
+        <p class="brand-subtitle">A crisp social space to share stories, connect with friends, and explore what matters.</p>
+      </div>
+    </div>
 
-    <p>Connect, Share and Discover</p>
+    <div class="cta-group">
+      <a href="/login" class="btn btn-primary">Login</a>
+      <a href="/register" class="btn btn-secondary">Register</a>
+    </div>
 
-    <a href="/login">
-        <button>Login</button>
-    </a>
-
-    <a href="/register">
-        <button>Register</button>
-    </a>
+    <ul class="feature-list">
+      <li class="feature-item"><span>1</span> Smooth feed with likes, comments, and conversations.</li>
+      <li class="feature-item"><span>2</span> Profile stories, posts, and instant connections.</li>
+      <li class="feature-item"><span>3</span> Clean modern design with fast mobile-friendly layout.</li>
+    </ul>
+  </div>
+</div>
 
 </body>
 </html>
