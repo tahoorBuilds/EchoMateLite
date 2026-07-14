@@ -3,6 +3,8 @@ import mysql.connector
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import jsonify
 
 app = Flask(__name__)
 app.secret_key = "echomatelite_secret_key"
@@ -20,8 +22,8 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 try:
     db = mysql.connector.connect(
         host="localhost",
-        user="root",
-        password="",
+        user="echo",
+        password="echo123",
         database="echomatelite"
     )
     cursor = db.cursor(buffered=True)
@@ -43,10 +45,21 @@ def dashboard():
 
     if "user_id" not in session:
         return redirect("/login")
+    
+    sql = """
+    UPDATE users
+    SET last_seen=NOW()
+    WHERE id=%s
+    """
+
+    values = (session["user_id"],)
+
+    cursor.execute(sql, values)
+    db.commit()
 
     # User Info
     sql = """
-    SELECT username, profile_pic
+    SELECT username, profile_pic, bio
     FROM users
     WHERE id=%s
     """
@@ -90,12 +103,91 @@ def dashboard():
 
     following_count = cursor.fetchone()[0]
 
+    # Notifications Count
+    sql = """
+    SELECT COUNT(*)
+    FROM notifications
+    WHERE user_id=%s
+    """ 
+
+    cursor.execute(sql, values)
+
+    notifications_count = cursor.fetchone()[0]  
+
     return render_template(
         "dashboard.html",
         user=user,
         total_posts=total_posts,
         followers_count=followers_count,
-        following_count=following_count
+        following_count=following_count,
+        notifications_count=notifications_count
+    )
+
+@app.route("/editbio", methods=["GET", "POST"])
+def editbio():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        bio = request.form["bio"]
+
+        sql = """
+        UPDATE users
+        SET bio=%s
+        WHERE id=%s
+        """
+
+        values = (bio, session["user_id"])
+
+        cursor.execute(sql, values)
+        db.commit()
+
+        return redirect("/profile")
+
+    return render_template("editbio.html")
+
+@app.route("/searchpost", methods=["GET", "POST"])
+def searchpost():
+
+    posts = []
+
+    if request.method == "POST":
+
+        keyword = request.form["keyword"]
+
+        sql = """
+        SELECT
+            posts.id,
+            posts.content,
+            users.username,
+            users.id,
+            posts.image
+          FROM posts
+
+          JOIN users
+          ON posts.user_id = users.id
+
+          WHERE
+          posts.content LIKE %s
+          OR users.username LIKE %s
+
+          ORDER BY posts.id DESC
+          """
+
+        values =(
+                f"%{keyword}%",
+                f"%{keyword}%"
+            )
+
+        cursor.execute(sql, values)
+
+        posts = cursor.fetchall()
+    
+    return render_template(
+        "searchpost.html",
+        posts=posts
     )
 
 # Register
@@ -108,8 +200,10 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
 
+        hashed_password = generate_password_hash(password, method="pbkdf2:sha256")
+
         sql = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-        values = (username, email, password)
+        values = (username, email, hashed_password)
 
         cursor.execute(sql, values)
         db.commit()
@@ -119,7 +213,8 @@ def register():
     return render_template("register.html")
 
 
-# Login
+from werkzeug.security import check_password_hash
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -132,6 +227,8 @@ def login():
         print("PASSWORD =", password)
 
         try:
+
+            db.ping(reconnect=True, attempts=3, delay=2)
 
             sql = "SELECT * FROM users WHERE email=%s"
             values = (email,)
@@ -146,12 +243,15 @@ def login():
 
                 print("DATABASE PASSWORD =", user[3])
 
-                if password == user[3]:
+                if user[3] == password:
 
-                    session['user_id'] = user[0]
-                    session['username'] = user[1]
+                    session["user_id"] = user[0]
+                    session["username"] = user[1]
+                    session["profile_pic"] = user[5]
+                    print(user)
+                    print(session["profile_pic"])
 
-                    return redirect("/dashboard")
+                    return redirect("/feed")
 
                 else:
                     return "Wrong Password!"
@@ -210,40 +310,100 @@ def uploadprofilepic():
 def createpost():
 
     if request.method == "POST":
-        
-        if 'user_id' not in session:
+
+        print("POST RECEIVED")
+
+        if "user_id" not in session:
             return redirect("/login")
 
         content = request.form["content"]
-        user_id = session.get('user_id')
+
+        print("Content:", content)
+
+        image = request.files.get("image")
+        image_name = None
+
+        if image and image.filename:
+
+            image_name = image.filename
+
+            print("Image:", image_name)
+
+            image.save(
+                os.path.join(
+                    "static/post_images",
+                    image_name
+                )
+            )
+
+        user_id = session["user_id"]
 
         try:
-            sql = "INSERT INTO posts (content, user_id) VALUES (%s, %s)"
-            values = (content, user_id)
+
+            sql = """
+            INSERT INTO posts (content, user_id, image)
+            VALUES (%s, %s, %s)
+            """
+
+            values = (
+                content,
+                user_id,
+                image_name
+            )
 
             cursor.execute(sql, values)
             db.commit()
 
+            print("POST SAVED SUCCESSFULLY")
+
             return redirect("/feed")
+
         except Exception as e:
-            return f"Error Creating Post: {str(e)}"
+
+            print("DATABASE ERROR:", e)
+
+            return f"Error Creating Post: {e}"
 
     return render_template("createpost.html")
 
-# Feed
+@app.route("/savepost/<int:post_id>")
+def savepost(post_id):
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    sql = """
+    INSERT INTO saved_posts (user_id, post_id)
+    VALUES (%s, %s)
+    """
+
+    values = (
+        session["user_id"],
+        post_id
+    )
+
+    cursor.execute(sql, values)
+    db.commit()
+
+    return redirect("/feed")
+
 @app.route("/feed")
 def feed():
 
     if "user_id" not in session:
         return redirect("/login")
 
+    # Feed Posts
     sql = """
     SELECT
         posts.id,
         posts.content,
         users.username,
+        users.profile_pic,
         posts.created_at,
-        COUNT(DISTINCT likes.id) as total_likes
+        COUNT(DISTINCT likes.id) AS total_likes,
+        posts.image,
+        users.id
     FROM posts
 
     JOIN users
@@ -253,15 +413,12 @@ def feed():
     ON posts.id = likes.post_id
 
     WHERE
-    posts.user_id = %s
-
-    OR posts.user_id IN (
-
-        SELECT following_id
-        FROM followers
-        WHERE follower_id = %s
-
-    )
+        posts.user_id = %s
+        OR posts.user_id IN (
+            SELECT following_id
+            FROM followers
+            WHERE follower_id = %s
+        )
 
     GROUP BY posts.id
 
@@ -277,6 +434,7 @@ def feed():
 
     posts = cursor.fetchall()
 
+    # Like Status
     posts_with_like_status = []
 
     for post in posts:
@@ -284,12 +442,15 @@ def feed():
         liked = False
 
         sql = """
-        SELECT *
+        SELECT id
         FROM likes
         WHERE user_id=%s AND post_id=%s
         """
 
-        values = (session["user_id"], post[0])
+        values = (
+            session["user_id"],
+            post[0]
+        )
 
         cursor.execute(sql, values)
 
@@ -298,16 +459,24 @@ def feed():
 
         posts_with_like_status.append(post + (liked,))
 
+    # Comments
     all_comments = {}
 
     for post in posts:
 
         sql = """
-        SELECT comments.comment, users.username
+        SELECT
+            comments.comment,
+            users.username,
+            comments.id,
+            comments.user_id
         FROM comments
+
         JOIN users
         ON comments.user_id = users.id
+
         WHERE comments.post_id=%s
+
         ORDER BY comments.id DESC
         """
 
@@ -317,10 +486,55 @@ def feed():
 
         all_comments[post[0]] = cursor.fetchall()
 
+    # Comment Count
+    comment_counts = {}
+
+    for post in posts:
+
+        sql = """
+        SELECT COUNT(*)
+        FROM comments
+        WHERE post_id=%s
+        """
+
+        values = (post[0],)
+
+        cursor.execute(sql, values)
+
+        comment_counts[post[0]] = cursor.fetchone()[0]
+
+    # Trending Posts
+    sql = """
+    SELECT
+        posts.id,
+        posts.content,
+        users.username,
+        COUNT(likes.id) AS total_likes
+    FROM posts
+
+    JOIN users
+    ON posts.user_id = users.id
+
+    LEFT JOIN likes
+    ON posts.id = likes.post_id
+
+    GROUP BY posts.id
+
+    ORDER BY total_likes DESC
+
+    LIMIT 5
+    """
+
+    cursor.execute(sql)
+
+    trending_posts = cursor.fetchall()
+
     return render_template(
         "feed.html",
         posts=posts_with_like_status,
-        all_comments=all_comments
+        all_comments=all_comments,
+        comment_counts=comment_counts,
+        trending_posts=trending_posts
     )
 
 @app.route("/profile")
@@ -330,7 +544,18 @@ def profile():
         return redirect("/login")
 
     sql = """
-    SELECT username, profile_pic
+    UPDATE users
+    SET last_seen=NOW()
+    WHERE id=%s
+    """
+
+    values = (session["user_id"],)
+
+    cursor.execute(sql, values)
+    db.commit()
+
+    sql = """
+    SELECT username, profile_pic,bio
     FROM users
     WHERE id=%s
     """
@@ -372,19 +597,18 @@ def deletepost(post_id):
     cursor.execute(sql, values)
     db.commit()
 
-    return redirect("/profile")
+    return redirect("/feed")
 
 @app.route("/like/<int:post_id>")
 def like(post_id):
 
     if "user_id" not in session:
-        return redirect("/login")
+        return jsonify({"success": False}), 401
 
     sql = """
     SELECT *
     FROM likes
     WHERE user_id=%s AND post_id=%s
-
     """
 
     values = (session["user_id"], post_id)
@@ -403,17 +627,13 @@ def like(post_id):
         cursor.execute(sql, values)
         db.commit()
 
-        # Get post owner
         sql = """
         SELECT user_id
         FROM posts
         WHERE id=%s
         """
 
-        values = (post_id,)
-
-        cursor.execute(sql, values)
-
+        cursor.execute(sql, (post_id,))
         post_owner = cursor.fetchone()[0]
 
         if post_owner != session["user_id"]:
@@ -425,46 +645,208 @@ def like(post_id):
             VALUES (%s, %s)
             """
 
-            values = (post_owner, notification)
-
-            cursor.execute(sql, values)
+            cursor.execute(sql, (post_owner, notification))
             db.commit()
 
-    return redirect("/feed")
+    sql = """
+    SELECT COUNT(*)
+    FROM likes
+    WHERE post_id=%s
+    """
+
+    cursor.execute(sql, (post_id,))
+    total_likes = cursor.fetchone()[0]
+
+    return jsonify({
+        "success": True,
+        "likes": total_likes
+    })
+
+@app.route("/postlikes/<int:post_id>")
+def postlikes(post_id):
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    sql = """
+    SELECT users.username
+    FROM likes
+    JOIN users
+    ON likes.user_id = users.id
+    WHERE likes.post_id=%s
+    """
+
+    values = (post_id,)
+
+    cursor.execute(sql, values)
+
+    users = cursor.fetchall()
+
+    return render_template(
+        "postlikes.html",
+        users=users
+    )
 
 @app.route("/unlike/<int:post_id>")
 def unlike(post_id):
 
     if "user_id" not in session:
-        return redirect("/login")
+        return jsonify({"success": False}), 401
 
     sql = """
     DELETE FROM likes
     WHERE user_id=%s AND post_id=%s
     """
 
-    values = (session["user_id"], post_id)
+    values = (
+        session["user_id"],
+        post_id
+    )
 
     cursor.execute(sql, values)
     db.commit()
 
-    return redirect("/feed")
+    # Total likes after unlike
+    sql = """
+    SELECT COUNT(*)
+    FROM likes
+    WHERE post_id=%s
+    """
+
+    cursor.execute(sql, (post_id,))
+
+    total_likes = cursor.fetchone()[0]
+
+    return jsonify({
+        "success": True,
+        "likes": total_likes
+    })
 
 @app.route("/comment/<int:post_id>", methods=["POST"])
 def comment(post_id):
 
     if "user_id" not in session:
-        return redirect("/login")
+        return jsonify({"success": False}), 401
 
     comment_text = request.form["comment"]
 
-    sql = "INSERT INTO comments (comment, user_id, post_id) VALUES (%s, %s, %s)"
-    values = (comment_text, session["user_id"], post_id)
+    sql = """
+    INSERT INTO comments (comment, user_id, post_id)
+    VALUES (%s, %s, %s)
+    """
+
+    values = (
+        comment_text,
+        session["user_id"],
+        post_id
+    )
 
     cursor.execute(sql, values)
     db.commit()
 
-    return redirect("/feed")
+    comment_id = cursor.lastrowid
+
+    # Get post owner
+    sql = """
+    SELECT user_id
+    FROM posts
+    WHERE id=%s
+    """
+
+    cursor.execute(sql, (post_id,))
+    post_owner = cursor.fetchone()[0]
+
+    if post_owner != session["user_id"]:
+
+        notification = f"{session['username']} commented on your post"
+
+        sql = """
+        INSERT INTO notifications (user_id, message)
+        VALUES (%s, %s)
+        """
+
+        cursor.execute(sql, (post_owner, notification))
+        db.commit()
+
+    return jsonify({
+    "success": True,
+    "username": session["username"],
+    "comment": comment_text,
+    "comment_id": comment_id,
+    "user_id": session["user_id"]
+})
+
+@app.route("/deletecomment/<int:comment_id>")
+def deletecomment(comment_id):
+
+    if "user_id" not in session:
+        return jsonify({"success": False}), 401
+
+    sql = """
+    DELETE FROM comments
+    WHERE id=%s AND user_id=%s
+    """
+
+    values = (
+        comment_id,
+        session["user_id"]
+    )
+
+    cursor.execute(sql, values)
+    db.commit()
+
+    return jsonify({
+        "success": True,
+        "comment_id": comment_id
+    })
+
+@app.route("/editcomment/<int:comment_id>", methods=["GET", "POST"])
+def editcomment(comment_id):
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        new_comment = request.form["comment"]
+
+        sql = """
+        UPDATE comments
+        SET comment=%s
+        WHERE id=%s AND user_id=%s
+        """
+
+        values = (
+            new_comment,
+            comment_id,
+            session["user_id"]
+        )
+
+        cursor.execute(sql, values)
+        db.commit()
+
+        return redirect("/feed")
+
+    sql = """
+    SELECT comment
+    FROM comments
+    WHERE id=%s AND user_id=%s
+    """
+
+    values = (
+        comment_id,
+        session["user_id"]
+    )
+
+    cursor.execute(sql, values)
+
+    comment = cursor.fetchone()
+
+    return render_template(
+        "editcomment.html",
+        comment=comment,
+        comment_id=comment_id
+    )
 
 @app.route("/editpost/<int:post_id>", methods=["GET", "POST"])
 def editpost(post_id):
@@ -527,7 +909,11 @@ def searchuser():
 @app.route("/user/<int:user_id>")
 def userprofile(user_id):
 
-    sql = "SELECT id, username FROM users WHERE id=%s"
+    sql = """
+    SELECT id, username, last_seen
+    FROM users
+    WHERE id=%s
+    """
     values = (user_id,)
 
     cursor.execute(sql, values)
@@ -539,7 +925,7 @@ def userprofile(user_id):
 
     # User Posts
     sql = """
-    SELECT id, content
+    SELECT id, content, image
     FROM posts
     WHERE user_id=%s
     ORDER BY id DESC
@@ -603,7 +989,8 @@ def userprofile(user_id):
         posts=posts,
         followers_count=followers_count,
         following_count=following_count,
-        is_following=is_following
+        is_following=is_following,
+        now=datetime.now()
     )
 
 @app.route("/follow/<int:user_id>")
@@ -770,5 +1157,146 @@ def notifications():
         notifications=notifications
     )
 
+@app.route("/sendmessage/<int:user_id>", methods=["GET", "POST"])
+def sendmessage(user_id):
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        message = request.form["message"]
+
+        sql = """
+        INSERT INTO messages
+        (sender_id, receiver_id, message)
+        VALUES (%s, %s, %s)
+        """
+
+        values = (
+            session["user_id"],
+            user_id,
+            message
+        )
+
+        cursor.execute(sql, values)
+        db.commit()
+
+        sql = """
+        INSERT INTO notifications
+        (user_id, message)
+        VALUES (%s, %s)
+        """
+
+        values = (
+        user_id,
+        "You received a new message"
+    )
+
+        cursor.execute(sql, values)
+        db.commit()
+
+        return redirect(f"/chat/{user_id}")
+
+    return render_template(
+        "sendmessage.html",
+        user_id=user_id
+    )
+
+@app.route("/inbox")
+def inbox():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    sql = """
+    SELECT DISTINCT
+        users.id,
+        users.username
+    FROM messages
+
+    JOIN users
+    ON messages.sender_id = users.id
+
+    WHERE messages.receiver_id=%s
+
+    ORDER BY users.username
+    """
+
+    values = (session["user_id"],)
+
+    cursor.execute(sql, values)
+
+    chats = cursor.fetchall()
+
+    return render_template(
+        "inbox.html",
+        chats=chats
+    )
+
+@app.route("/chat/<int:user_id>")
+def chat(user_id):
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    sql = """
+    SELECT
+        messages.id,
+        messages.message,
+        users.username,
+        messages.sender_id,
+        messages.created_at
+    FROM messages
+
+    JOIN users
+    ON messages.sender_id = users.id
+
+    WHERE
+    (messages.sender_id=%s AND messages.receiver_id=%s)
+    OR
+    (messages.sender_id=%s AND messages.receiver_id=%s)
+
+    ORDER BY messages.id
+    """
+
+    values = (
+        session["user_id"],
+        user_id,
+        user_id,
+        session["user_id"]
+    )
+
+    cursor.execute(sql, values)
+
+    messages = cursor.fetchall()
+
+    return render_template(
+        "chat.html",
+        messages=messages,
+        user_id=user_id
+    )
+
+@app.route("/deletemessage/<int:message_id>/<int:user_id>")
+def deletemessage(message_id, user_id):
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    sql = """
+    DELETE FROM messages
+    WHERE id=%s AND sender_id=%s
+    """
+
+    values = (
+        message_id,
+        session["user_id"]
+    )
+
+    cursor.execute(sql, values)
+    db.commit()
+
+    return redirect(f"/chat/{user_id}")
+
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=8000)
+    app.run(debug=True, host="0.0.0.0", port=8000)
