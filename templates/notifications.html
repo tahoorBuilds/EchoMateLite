@@ -119,13 +119,15 @@ Notifications
 
 {% for n in notifications %}
 
-<div class="notify">
+<a href="{{ n[1] if n[1] else url_for('notifications') }}" class="text-decoration-none text-dark">
+  <div class="notify">
 
-<h5>{{ n[0] }}</h5>
+  <h5>{{ n[0] }}</h5>
 
-<small>{{ n[1] }}</small>
+  <small>{{ n[2] }}</small>
 
-</div>
+  </div>
+</a>
 
 {% else %}
 

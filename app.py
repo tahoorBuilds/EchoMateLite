@@ -676,13 +676,14 @@ def like(post_id):
         if post_owner != session["user_id"]:
 
             notification = f"{session['username']} liked your post"
+            target_url = f"/feed#post{post_id}"
 
             sql = """
-            INSERT INTO notifications (user_id, message)
-            VALUES (%s, %s)
+            INSERT INTO notifications (user_id, message, target_url)
+            VALUES (%s, %s, %s)
             """
 
-            cursor.execute(sql, (post_owner, notification))
+            cursor.execute(sql, (post_owner, notification, target_url))
             db.commit()
 
     sql = """
@@ -797,13 +798,14 @@ def comment(post_id):
     if post_owner != session["user_id"]:
 
         notification = f"{session['username']} commented on your post"
+        target_url = f"/feed#post{post_id}"
 
         sql = """
-        INSERT INTO notifications (user_id, message)
-        VALUES (%s, %s)
+        INSERT INTO notifications (user_id, message, target_url)
+        VALUES (%s, %s, %s)
         """
 
-        cursor.execute(sql, (post_owner, notification))
+        cursor.execute(sql, (post_owner, notification, target_url))
         db.commit()
 
     return jsonify({
@@ -1067,13 +1069,14 @@ def follow(user_id):
 
     # Notification
     notification = f"{session['username']} followed you"
+    target_url = f"/userprofile/{session['user_id']}"
 
     sql = """
-    INSERT INTO notifications (user_id, message)
-    VALUES (%s, %s)
+    INSERT INTO notifications (user_id, message, target_url)
+    VALUES (%s, %s, %s)
     """
 
-    values = (user_id, notification)
+    values = (user_id, notification, target_url)
 
     cursor.execute(sql, values)
     db.commit()
@@ -1178,7 +1181,7 @@ def notifications():
         return redirect("/login")
 
     sql = """
-    SELECT message, created_at
+    SELECT message, target_url, created_at
     FROM notifications
     WHERE user_id=%s
     ORDER BY id DESC
@@ -1222,13 +1225,14 @@ def sendmessage(user_id):
 
         sql = """
         INSERT INTO notifications
-        (user_id, message)
-        VALUES (%s, %s)
+        (user_id, message, target_url)
+        VALUES (%s, %s, %s)
         """
 
         values = (
         user_id,
-        "You received a new message"
+        "You received a new message",
+        f"/chat/{session['user_id']}"
     )
 
         cursor.execute(sql, values)
