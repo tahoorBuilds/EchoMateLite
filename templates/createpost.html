@@ -1,51 +1,204 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Create Post</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create Post • EchoMateLite</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+body{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
+    min-height:100vh;
+    padding-bottom:100px;
+}
+
+.brand{
+    text-align:center;
+    padding:30px 0;
+}
+
+.brand a{
+    text-decoration:none;
+    color:white;
+}
+
+.brand h1{
+    font-weight:800;
+    margin:0;
+}
+
+.brand p{
+    color:#cbd5e1;
+}
+
+.post-card{
+    max-width:700px;
+    margin:auto;
+    background:rgba(255,255,255,.12);
+    backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:25px;
+    padding:35px;
+    color:white;
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
+}
+
+.form-control{
+    border-radius:18px;
+    border:none;
+    padding:14px;
+}
+
+.form-control:focus{
+    box-shadow:none;
+    border:2px solid #60a5fa;
+}
+
+textarea{
+    resize:none;
+}
+
+.btn-post{
+    border-radius:50px;
+    padding:12px 35px;
+    font-weight:bold;
+}
+
+.btn-back{
+    border-radius:50px;
+    padding:12px 35px;
+    font-weight:bold;
+}
+
+.preview{
+    display:none;
+    margin-top:20px;
+    width:100%;
+    border-radius:20px;
+}
+
+</style>
+
 </head>
-<body class="bg-light">
 
-<div class="container-fluid px-3 mt-4">
+<body>
 
-    <div class="card shadow p-4">
+<div class="container">
 
-        <h2>Create New Post</h2>
+<div class="brand">
 
-        <form method="POST" enctype="multipart/form-data">
+<a href="/dashboard">
 
-            <div class="mb-3">
-                <textarea
-                    name="content"
-                    class="form-control"
-                    rows="5"
-                    placeholder="What's on your mind?"
-                ></textarea>
-            </div>
+<h1>🚀 EchoMateLite</h1>
 
-            <div class="mb-3">
-                <label class="form-label">Upload Image</label>
-                <input
-                    type="file"
-                    name="image"
-                    class="form-control"
-                >
-            </div>
+</a>
 
-            <button type="submit" class="btn btn-primary">
-                Post
-            </button>
-
-            <a href="/dashboard" class="btn btn-secondary">
-                Back
-            </a>
-
-        </form>
-
-    </div>
+<p>Create something amazing</p>
 
 </div>
+
+<div class="post-card">
+
+<h3 class="mb-4">
+
+✨ Create New Post
+
+</h3>
+
+<form
+method="POST"
+enctype="multipart/form-data">
+
+<div class="mb-3">
+
+<textarea
+name="content"
+rows="6"
+class="form-control"
+placeholder="What's on your mind?"></textarea>
+
+</div>
+
+<div class="mb-4">
+
+<label class="form-label">
+
+📷 Upload Image
+
+</label>
+
+<input
+type="file"
+name="image"
+class="form-control"
+accept="image/*"
+onchange="previewImage(event)">
+
+<img
+id="preview"
+class="preview">
+
+</div>
+
+<div class="d-flex gap-3">
+
+<button
+class="btn btn-primary btn-post">
+
+🚀 Publish
+
+</button>
+
+<a
+href="/dashboard"
+class="btn btn-light btn-back">
+
+← Back
+
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+{% include "navbar.html" %}
+
+<script>
+
+function previewImage(event){
+
+const file=event.target.files[0];
+
+if(file){
+
+const reader=new FileReader();
+
+reader.onload=function(e){
+
+const img=document.getElementById("preview");
+
+img.src=e.target.result;
+
+img.style.display="block";
+
+}
+
+reader.readAsDataURL(file);
+
+}
+
+}
+
+</script>
 
 </body>
 </html>

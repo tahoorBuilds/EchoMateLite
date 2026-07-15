@@ -1,98 +1,265 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>User Profile</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>{{ user[1] }} • EchoMateLite</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+body{
+background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
+min-height:100vh;
+padding-bottom:100px;
+}
+
+.profile-card{
+max-width:900px;
+margin:40px auto;
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(18px);
+border-radius:25px;
+padding:35px;
+color:white;
+box-shadow:0 15px 40px rgba(0,0,0,.25);
+}
+
+.logo{
+text-align:center;
+margin-bottom:25px;
+}
+
+.logo a{
+text-decoration:none;
+color:white;
+}
+
+.logo h1{
+font-weight:800;
+margin:0;
+}
+
+.avatar{
+width:140px;
+height:140px;
+border-radius:50%;
+object-fit:cover;
+border:5px solid white;
+margin-bottom:15px;
+}
+
+.stats{
+display:flex;
+justify-content:center;
+gap:45px;
+margin:25px 0;
+text-align:center;
+}
+
+.stats h3{
+margin:0;
+font-weight:700;
+}
+
+.post-card{
+background:white;
+color:#111827;
+border-radius:18px;
+padding:20px;
+margin-top:20px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.post-card img{
+width:100%;
+border-radius:15px;
+margin-top:12px;
+}
+
+.action-btn{
+border-radius:50px;
+padding:12px 30px;
+font-weight:bold;
+}
+
+</style>
+
 </head>
-<body class="bg-light">
 
-<div class="container-fluid px-3 mt-4">
+<body>
 
-    <div class="card p-4 shadow">
+<div class="profile-card">
 
-        <h1>{{ user[1] }}</h1>
+<div class="logo">
 
-        {% if user[2] %}
+<a href="/dashboard">
 
-             {% set seconds = (now - user[2]).total_seconds() %}
+<h1>🚀 EchoMateLite</h1>
 
-             {% if seconds < 300 %}
-
-                 <p class="text-success">
-                      🟢 Online
-                 </p>
-
-             {% else %}
-
-                 <p class="text-secondary">
-                    ⚫ Last Seen Recently
-                 </p>
-
-             {% endif %}
-
-        {% endif %}
-
-        <p><strong>Followers:</strong> {{ followers_count }}</p>
-
-        <p><strong>Following:</strong> {{ following_count }}</p>
-
-        <p><strong>Posts:</strong> {{ posts|length }}</p>
-
-        <hr>
-
-        <h3>User Posts</h3>
-
-        {% for post in posts %}
-
-        <div class="card mb-3">
-            <div class="card-body">
-
-                <p>{{ post[1] }}</p>
-
-                {% if post[2] %}
-
-                <img
-                    src="/static/post_images/{{ post[2] }}"
-                    class="img-fluid rounded mt-2"
-                    style="max-height:400px;">
-
-                {% endif %}
-
-            </div>
-        </div>
-
-        {% endfor %}
-
-        {% if is_following %}
-
-        <a href="/unfollow/{{ user[0] }}"
-           class="btn btn-danger mb-3">
-            Unfollow
-        </a>
-
-        {% else %}
-
-        <a href="/follow/{{ user[0] }}"
-           class="btn btn-success mb-3">
-            Follow
-        </a>
-
-        <a href="/sendmessage/{{ user[0] }}"
-            class="btn btn-primary mb-3">
-            💬 Message
-        </a>
-
-        {% endif %}
-
-        <a href="/dashboard" class="btn btn-primary">
-            Back to Dashboard
-        </a>
-
-    </div>
+</a>
 
 </div>
+
+<div class="text-center">
+
+{% if user[3] %}
+
+<img
+src="{{ url_for('static', filename='profile_pics/' + user[3]) }}"
+class="avatar">
+
+{% else %}
+
+<img
+src="https://ui-avatars.com/api/?name={{ user[1] }}"
+class="avatar">
+
+{% endif %}
+
+<h2>{{ user[1] }}</h2>
+
+{% if user[2] %}
+
+{% set seconds=(now-user[2]).total_seconds() %}
+
+{% if seconds<300 %}
+
+<p class="text-success fw-bold">
+
+🟢 Online
+
+</p>
+
+{% else %}
+
+<p class="text-light">
+
+⚫ Last seen recently
+
+</p>
+
+{% endif %}
+
+{% endif %}
+
+</div>
+
+<div class="stats">
+
+<div>
+
+<h3>{{ posts|length }}</h3>
+
+<small>Posts</small>
+
+</div>
+
+<div>
+
+<h3>{{ followers_count }}</h3>
+
+<small>Followers</small>
+
+</div>
+
+<div>
+
+<h3>{{ following_count }}</h3>
+
+<small>Following</small>
+
+</div>
+
+</div>
+
+<div class="text-center mb-4">
+
+{% if is_following %}
+
+<a
+href="/unfollow/{{ user[0] }}"
+class="btn btn-danger action-btn">
+
+➖ Unfollow
+
+</a>
+
+{% else %}
+
+<a
+href="/follow/{{ user[0] }}"
+class="btn btn-success action-btn">
+
+➕ Follow
+
+</a>
+
+<a
+href="/sendmessage/{{ user[0] }}"
+class="btn btn-primary action-btn">
+
+💬 Message
+
+</a>
+
+{% endif %}
+
+</div>
+
+<h3 class="mb-3">
+
+Posts
+
+</h3>
+
+{% for post in posts %}
+
+<div class="post-card">
+
+<p>
+
+{{ post[1] }}
+
+</p>
+
+{% if post[2] %}
+
+<img
+src="{{ url_for('static', filename='post_images/' + post[2]) }}">
+
+{% endif %}
+
+</div>
+
+{% else %}
+
+<div class="alert alert-light">
+
+No posts yet.
+
+</div>
+
+{% endfor %}
+
+<div class="text-center mt-5">
+
+<a
+href="/dashboard"
+class="btn btn-light rounded-pill px-5">
+
+🏠 Dashboard
+
+</a>
+
+</div>
+
+</div>
+
+{% include "navbar.html" %}
 
 </body>
 </html>

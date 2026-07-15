@@ -387,6 +387,28 @@ def savepost(post_id):
 
     return redirect("/feed")
 
+@app.route("/myposts")
+def myposts():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    sql = """
+    SELECT id, content, image
+    FROM posts
+    WHERE user_id=%s
+    ORDER BY id DESC
+    """
+
+    cursor.execute(sql, (session["user_id"],))
+
+    posts = cursor.fetchall()
+
+    return render_template(
+        "myposts.html",
+        posts=posts
+    )
+
 @app.route("/feed")
 def feed():
 
@@ -543,53 +565,65 @@ def profile():
     if "user_id" not in session:
         return redirect("/login")
 
+    # Update last seen
     sql = """
     UPDATE users
     SET last_seen=NOW()
     WHERE id=%s
     """
-
-    values = (session["user_id"],)
-
-    cursor.execute(sql, values)
+    cursor.execute(sql, (session["user_id"],))
     db.commit()
 
+    # User info
     sql = """
-    SELECT username, profile_pic,bio
+    SELECT username, profile_pic, bio
     FROM users
     WHERE id=%s
     """
-
-    values = (session["user_id"],)
-
-    cursor.execute(sql, values)
-
+    cursor.execute(sql, (session["user_id"],))
     user = cursor.fetchone()
 
+    # My posts
     sql = """
-    SELECT id, content
+    SELECT id, content, image
     FROM posts
     WHERE user_id=%s
     ORDER BY id DESC
     """
-
-    values = (session["user_id"],)
-
-    cursor.execute(sql, values)
-
+    cursor.execute(sql, (session["user_id"],))
     posts = cursor.fetchall()
+
+    # Followers count
+    sql = """
+    SELECT COUNT(*)
+    FROM followers
+    WHERE following_id=%s
+    """
+    cursor.execute(sql, (session["user_id"],))
+    followers_count = cursor.fetchone()[0]
+
+    # Following count
+    sql = """
+    SELECT COUNT(*)
+    FROM followers
+    WHERE follower_id=%s
+    """
+    cursor.execute(sql, (session["user_id"],))
+    following_count = cursor.fetchone()[0]
 
     return render_template(
         "profile.html",
         posts=posts,
-        user=user
+        user=user,
+        followers_count=followers_count,
+        following_count=following_count
     )
 
 @app.route("/deletepost/<int:post_id>")
 def deletepost(post_id):
 
     if "user_id" not in session:
-        return redirect("/login")
+        return jsonify({"success": False}), 401
 
     sql = "DELETE FROM posts WHERE id=%s AND user_id=%s"
     values = (post_id, session["user_id"])
@@ -597,7 +631,10 @@ def deletepost(post_id):
     cursor.execute(sql, values)
     db.commit()
 
-    return redirect("/feed")
+    return jsonify({
+        "success": True,
+        "post_id": post_id
+    })
 
 @app.route("/like/<int:post_id>")
 def like(post_id):
@@ -658,9 +695,10 @@ def like(post_id):
     total_likes = cursor.fetchone()[0]
 
     return jsonify({
-        "success": True,
-        "likes": total_likes
-    })
+    "success": True,
+    "liked": True,
+    "likes": total_likes
+})
 
 @app.route("/postlikes/<int:post_id>")
 def postlikes(post_id):
@@ -714,13 +752,13 @@ def unlike(post_id):
     """
 
     cursor.execute(sql, (post_id,))
-
     total_likes = cursor.fetchone()[0]
 
     return jsonify({
-        "success": True,
-        "likes": total_likes
-    })
+    "success": True,
+    "liked": False,
+    "likes": total_likes
+})
 
 @app.route("/comment/<int:post_id>", methods=["POST"])
 def comment(post_id):
@@ -770,17 +808,17 @@ def comment(post_id):
 
     return jsonify({
     "success": True,
-    "username": session["username"],
     "comment": comment_text,
-    "comment_id": comment_id,
-    "user_id": session["user_id"]
+    "username": session["username"],
+    "user_id": session["user_id"],
+    "comment_id": comment_id
 })
 
-@app.route("/deletecomment/<int:comment_id>")
-def deletecomment(comment_id):
+@app.route("/deletecomment/<int:comment_id>/<int:post_id>")
+def deletecomment(comment_id, post_id):
 
     if "user_id" not in session:
-        return jsonify({"success": False}), 401
+        return redirect("/login")
 
     sql = """
     DELETE FROM comments
@@ -796,9 +834,9 @@ def deletecomment(comment_id):
     db.commit()
 
     return jsonify({
-        "success": True,
-        "comment_id": comment_id
-    })
+    "success": True,
+    "comment_id": comment_id
+})
 
 @app.route("/editcomment/<int:comment_id>", methods=["GET", "POST"])
 def editcomment(comment_id):
