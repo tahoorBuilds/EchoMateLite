@@ -30,4 +30,11 @@
         <small>Profile</small>
     </a>
 
+    {% if session.user_id %}
+    <a href="/logout" class="nav-item">
+        <span>🚪</span>
+        <small>Logout</small>
+    </a>
+    {% endif %}
+
 </nav>
