@@ -3,149 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Notifications • EchoMateLite</title>
 
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 <style>
-
-body{
-    margin:0;
-    min-height:100vh;
-    font-family:'Poppins',sans-serif;
-    background:
-        radial-gradient(circle at top left,rgba(59,130,246,.15),transparent 28%),
-        radial-gradient(circle at bottom right,rgba(6,182,212,.18),transparent 28%),
-        linear-gradient(135deg,#eef5ff 0%,#f8fbff 100%);
-    padding-bottom:100px;
+body {
+    margin: 0;
+    padding: 0;
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding-bottom: 120px;
 }
 
-.page{
-    max-width:800px;
-    margin:35px auto;
-    padding:35px;
-    background:rgba(255,255,255,.95);
-    border-radius:30px;
-    box-shadow:0 20px 50px rgba(0,0,0,.08);
+.page-container {
+    width: min(100%, 550px);
+    margin: 10px auto 24px;
+    padding: 0 16px;
 }
 
-.logo{
-    text-align:center;
-    margin-bottom:35px;
+.page-header {
+    text-align: center;
+    margin-bottom: 24px;
 }
 
-.logo a{
-    text-decoration:none;
-    color:#1e3a8a;
+.page-header h2 {
+    font-weight: 800;
+    background: linear-gradient(90deg, #4A3AFF 0%, #FF6B4A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    font-size: 28px;
 }
 
-.logo h1{
-    font-weight:800;
-    color:#1e3a8a;
-    margin-bottom:8px;
+.ui-card {
+    background: #ffffff;
+    border-radius: 36px;
+    padding: 30px 20px;
+    color: #000000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
-.logo h4{
-    color:#64748b;
-    font-weight:600;
+.notify-item {
+    background: #F4F4F5;
+    border-radius: 20px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    transition: 0.2s;
+    display: block;
+    text-decoration: none;
+    color: #111827;
+    border: 1px solid transparent;
 }
 
-.notify{
-    background:#ffffff;
-    border-radius:22px;
-    padding:20px;
-    margin-bottom:18px;
-    border:1px solid #e5e7eb;
-    box-shadow:0 10px 25px rgba(0,0,0,.06);
-    transition:.25s;
+.notify-item:hover {
+    background: #eef0f2;
+    border-color: #ddd;
 }
 
-.notify:hover{
-    transform:translateY(-3px);
-    box-shadow:0 18px 35px rgba(37,99,235,.12);
+.notify-item h5 {
+    color: #111827;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
 }
 
-.notify h5{
-    color:#1e3a8a;
-    font-weight:700;
-    margin-bottom:8px;
+.notify-item small {
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 500;
 }
 
-.notify small{
-    color:#6b7280;
+/* --- BOTTOM NAV --- */
+.bottom-nav-container {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    width: min(85%, 320px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px;
+    background: #1C1C1E;
+    border-radius: 40px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+    z-index: 9999;
 }
-
-.btn{
-    border-radius:50px;
-    padding:12px 32px;
-    font-weight:600;
+.nav-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #8E8E93;
+    text-decoration: none;
+    transition: 0.3s;
 }
-
-@media(max-width:768px){
-
-.page{
-    margin:20px 12px;
-    padding:24px;
-    border-radius:24px;
-}
-
-}
-
+.nav-item.active { background: #ffffff; color: #000000; }
+.nav-icon { font-size: 20px; }
 </style>
-
 </head>
 
 <body>
-
-<div class="page">
-
-<div class="logo">
-
-<a href="/dashboard">
-
-<h1>🚀 EchoMateLite</h1>
-
-</a>
-
-<h4 class="text-white">
-
-Notifications
-
-</h4>
-
-</div>
-
-{% for n in notifications %}
-
-<a href="{{ n[1] if n[1] else url_for('notifications') }}" class="text-decoration-none text-dark">
-  <div class="notify">
-
-  <h5>{{ n[0] }}</h5>
-
-  <small>{{ n[2] }}</small>
-
-  </div>
-</a>
-
-{% else %}
-
-<div class="alert alert-light">
-
-No notifications.
-
-</div>
-
-{% endfor %}
-
-<div class="text-center mt-4">
-
-</div>
-
-</div>
-
 {% include "navbar.html" %}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/feed" class="text-decoration-none">
+            <h2>EchoMateLite</h2>
+        </a>
+        <p class="text-white-50 mt-1">Activity & Alerts</p>
+    </div>
+
+    <div class="ui-card">
+        <h5 class="fw-bold mb-4 px-2">🔔 Notifications</h5>
+
+        {% for n in notifications %}
+        <a href="{{ n[1] if n[1] else url_for('notifications') }}" class="notify-item">
+            <h5>{{ n[0] }}</h5>
+            <small>{{ n[2] }}</small>
+        </a>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-bell-slash" style="font-size: 40px; color: #ccc;"></i>
+            <h6 class="mt-3 fw-bold">No notifications yet</h6>
+            <p class="small mb-0">We'll let you know when something happens.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav-container">
+    <a href="/feed" class="nav-item">
+        <i class="bi bi-house-door-fill nav-icon"></i>
+    </a>
+    <a href="/searchuser" class="nav-item">
+        <i class="bi bi-search nav-icon"></i>
+    </a>
+    <a href="/createpost" class="nav-item">
+        <i class="bi bi-plus-square nav-icon"></i>
+    </a>
+    <a href="/profile" class="nav-item">
+        <i class="bi bi-person-fill nav-icon"></i>
+    </a>
+</div>
 
 </body>
 </html>

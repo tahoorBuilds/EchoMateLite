@@ -3,105 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Followers • EchoMateLite</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 <style>
-
-body{
-background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
-min-height:100vh;
-padding-bottom:100px;
+body {
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 120px;
 }
-
-.page{
-max-width:700px;
-margin:40px auto;
+.page-container {
+    width: min(100%, 550px);
+    margin: 20px auto 24px;
+    padding: 0 16px;
 }
-
-.logo{
-text-align:center;
-margin-bottom:30px;
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
 }
-
-.logo a{
-text-decoration:none;
-color:white;
+.brand-title {
+    font-size: 24px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #4A3AFF 0%, #FF6B4A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
 }
-
-.logo h1{
-font-weight:800;
+.ui-card {
+    background: #ffffff;
+    border-radius: 36px;
+    padding: 24px 20px;
+    color: #000000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
-
-.card-user{
-background:rgba(255,255,255,.12);
-backdrop-filter:blur(18px);
-border-radius:20px;
-padding:18px 22px;
-margin-bottom:18px;
+.user-row {
+    background: #F4F4F5;
+    border-radius: 20px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: 0.2s;
 }
-
-.card-user a{
-color:white;
-text-decoration:none;
-font-size:20px;
-font-weight:600;
-display:block;
+.user-row:hover { background: #eef0f2; }
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #000;
 }
-
-.card-user:hover{
-transform:translateY(-3px);
-transition:.25s;
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-
+.username {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+.btn-view {
+    background: #000;
+    color: #fff;
+    border-radius: 16px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
 </style>
-
 </head>
-
 <body>
 
-<div class="page">
+<div class="page-container">
+    <div class="header-bar">
+        <a href="/feed" class="brand-title">EchoMateLite</a>
+        <a href="javascript:history.back()" class="btn btn-dark rounded-pill px-3 py-1" style="font-size: 14px;">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
 
-<div class="logo">
+    <div class="ui-card">
+        <h5 class="fw-bold mb-4">👥 Followers</h5>
 
-<a href="/dashboard">
-
-<h1>🚀 EchoMateLite</h1>
-
-</a>
-
-<h4 class="text-white">Followers</h4>
-
-</div>
-
-{% for user in followers %}
-
-<div class="card-user">
-
-<a href="/user/{{ user[0] }}">
-
-👤 {{ user[1] }}
-
-</a>
-
-</div>
-
-{% else %}
-
-<div class="alert alert-light">
-
-No followers yet.
-
-</div>
-
-{% endfor %}
-
+        {% for user in followers %}
+        <div class="user-row">
+            <a href="/user/{{ user[0] }}" class="user-info">
+                {% if user[2] and user[2] != 'None' %}
+                <img src="{{ url_for('static', filename='profile_pics/' + user[2]) }}" class="user-avatar" onerror="this.src='https://ui-avatars.com/api/?name={{ user[1] }}'">
+                {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ user[1] }}" class="user-avatar">
+                {% endif %}
+                <p class="username">@{{ user[1] }}</p>
+            </a>
+            <a href="/user/{{ user[0] }}" class="btn-view">View</a>
+        </div>
+        {% else %}
+        <div class="text-center text-muted my-4">
+            <p>📭 No followers found.</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
 {% include "navbar.html" %}
-
 </body>
 </html>

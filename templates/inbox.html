@@ -3,125 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Inbox • EchoMateLite</title>
 
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 <style>
-
-body{
-background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
-min-height:100vh;
-padding-bottom:100px;
+body {
+    margin: 0;
+    padding: 0;
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding-bottom: 120px;
 }
 
-.page{
-max-width:750px;
-margin:40px auto;
+.page-container {
+    width: min(100%, 550px);
+    margin: 20px auto 24px;
+    padding: 0 16px;
 }
 
-.logo{
-text-align:center;
-margin-bottom:30px;
+.page-header {
+    text-align: center;
+    margin-bottom: 24px;
 }
 
-.logo a{
-text-decoration:none;
-color:white;
+.page-header h2 {
+    font-weight: 800;
+    background: linear-gradient(90deg, #4A3AFF 0%, #FF6B4A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    font-size: 28px;
 }
 
-.logo h1{
-font-weight:800;
+.ui-card {
+    background: #ffffff;
+    border-radius: 36px;
+    padding: 24px 20px;
+    color: #000000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
-.chat-card{
-background:rgba(255,255,255,.12);
-backdrop-filter:blur(18px);
-border-radius:22px;
-padding:20px;
-margin-bottom:18px;
-color:white;
-display:flex;
-justify-content:space-between;
-align-items:center;
+.chat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #F4F4F5;
+    border-radius: 24px;
+    margin-bottom: 12px;
+    transition: 0.2s;
 }
 
-.chat-card h5{
-margin:0;
-font-weight:600;
+.chat-row:hover {
+    background: #eef0f2;
 }
 
+.chat-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.chat-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
+.chat-name {
+    margin: 0;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.btn-dark-custom {
+    background: #000;
+    color: #fff;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+/* --- BOTTOM NAV CSS ADD KIYA GAYA HAI --- */
+.bottom-nav-container {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    width: min(85%, 320px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px;
+    background: #1C1C1E;
+    border-radius: 40px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+    z-index: 9999;
+}
+.nav-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #8E8E93;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.nav-item.active { background: #ffffff; color: #000000; }
+.nav-icon { font-size: 20px; }
 </style>
-
 </head>
 
 <body>
-
-<div class="page">
-
-<div class="logo">
-
-<a href="/dashboard">
-
-<h1>🚀 EchoMateLite</h1>
-
-</a>
-
-<h4 class="text-white">
-
-Inbox
-
-</h4>
-
-</div>
-
-{% if chats %}
-
-{% for chat in chats %}
-
-<div class="chat-card">
-
-<div>
-
-<h5>
-
-👤 {{ chat[1] }}
-
-</h5>
-
-</div>
-
-<a
-href="/chat/{{ chat[0] }}"
-class="btn btn-light rounded-pill">
-
-Open Chat →
-
-</a>
-
-</div>
-
-{% endfor %}
-
-{% else %}
-
-<div class="alert alert-light">
-
-No chats yet.
-
-</div>
-
-{% endif %}
-
-<div class="text-center mt-4">
-
-</div>
-
-</div>
-
 {% include "navbar.html" %}
+
+<div class="page-container">
+    <div class="page-header">
+        <h2>Inbox</h2>
+        <p class="text-white-50 mt-1">Your conversations</p>
+    </div>
+
+    <div class="ui-card">
+        {% if chats %}
+            <h5 class="fw-bold mb-4 px-2">Recent Chats</h5>
+            {% for chat in chats %}
+            <div class="chat-row">
+                <div class="chat-user">
+                    <div class="chat-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <h5 class="chat-name">{{ chat[1] }}</h5>
+                </div>
+                <a href="/chat/{{ chat[0] }}" class="btn-dark-custom">Chat →</a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-chat-dots" style="font-size: 45px; color: #ccc;"></i>
+                <h5 class="mt-3 fw-bold">No messages yet</h5>
+                <p class="mb-0">When you chat with someone, it will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- EXACT MATCH BOTTOM NAV -->
+<div class="bottom-nav-container">
+    <a href="/feed" class="nav-item">
+        <i class="bi bi-house-door-fill nav-icon"></i>
+    </a>
+    <a href="/searchuser" class="nav-item">
+        <i class="bi bi-search nav-icon"></i>
+    </a>
+    <a href="/createpost" class="nav-item">
+        <i class="bi bi-plus-square nav-icon"></i>
+    </a>
+    <a href="/profile" class="nav-item">
+        <i class="bi bi-person-fill nav-icon"></i>
+    </a>
+</div>
 
 </body>
 </html>

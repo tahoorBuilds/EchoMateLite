@@ -13,19 +13,15 @@
 *, *::before, *::after {
   box-sizing: border-box;
 }
+
 body{
-  margin:0;
-  min-height:100vh;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color:var(--text-primary);
-
-  background:
-      radial-gradient(circle at 10% 10%,rgba(37,99,235,.35),transparent 28%),
-      radial-gradient(circle at 90% 90%,rgba(6,182,212,.35),transparent 28%),
-      linear-gradient(135deg,#0f172a 0%,#1d4ed8 55%,#38bdf8 100%);
-
-  background-attachment:fixed;
-  padding-bottom:120px;
+    margin:0;
+    min-height:100vh;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:#0f0f10;
+    color:#fff;
+    padding-bottom:120px;
+    -webkit-font-smoothing:antialiased;
 }
 
 body::before,
@@ -59,8 +55,10 @@ body::after{
 }
 @media(max-width:768px){
 
-.container-hero{
-    padding:20px;
+.container{
+    max-width:700px;
+    margin:auto;
+    padding:0;
 }
 
 .auth-card{
@@ -291,32 +289,49 @@ body::after{
 
 /* Bottom Navbar */
 
-.bottom-nav{
+.bottom-nav-container{
     position:fixed;
-    bottom:20px;
+
     left:50%;
+    bottom:18px;
+
     transform:translateX(-50%);
-    width:min(95%,700px);
-    background:#ffffff;
-    border-radius:20px;
+
+    width:min(92%,430px);
+
+    height:74px;
+
     display:flex;
     justify-content:space-around;
     align-items:center;
-    padding:12px 8px;
-    box-shadow:0 15px 35px rgba(0,0,0,.12);
+
+    background:rgba(20,20,20,.92);
+
+    backdrop-filter:blur(24px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:999px;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.45);
+
     z-index:9999;
 }
 
 .nav-item{
-    text-decoration:none;
-    color:#64748b;
     display:flex;
     flex-direction:column;
     align-items:center;
+    justify-content:center;
+
     gap:4px;
-    font-size:13px;
+
+    color:#8e8e8e;
+
+    text-decoration:none;
+
     transition:.25s;
-    font-weight:600;
 }
 
 .nav-item span{
@@ -324,8 +339,15 @@ body::after{
 }
 
 .nav-item:hover{
-    color:#2563eb;
-    transform:translateY(-3px);
+    color:#ffffff;
+
+    transform:translateY(-4px);
+}
+
+.nav-icon{
+    font-size:23px;
+
+    line-height:1;
 }
 
 @media(max-width:768px){
@@ -371,6 +393,7 @@ input[type="file"]{
     margin:20px 10px;
     border-radius:20px;
 }
+
 /* ===== PROFILE PAGE ===== */
 
 .profile-card{
@@ -473,4 +496,288 @@ input[type="file"]{
 .bio p{
     color:#475569;
     margin-bottom:20px;
+}
+
+/* ===== TOP NAV ===== */
+
+.navbar{
+    position:sticky;
+    top:0;
+    z-index:1000;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:18px 22px;
+
+    background:#111;
+}
+
+.brand h2{
+    margin:0;
+    font-size:34px;
+    font-weight:900;
+    letter-spacing:-1px;
+
+    background:linear-gradient(90deg,#7c3aed,#4f46e5);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.notify-btn{
+    width:46px;
+    height:46px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+    text-decoration:none;
+
+    background:#1a1a1a;
+    color:#fff;
+
+    transition:.25s;
+}
+
+.notify-btn:hover{
+    background:#2b2b2b;
+    color:#fff;
+}
+
+.notify-btn i{
+    font-size:20px;
+}
+
+.stories-container{
+    display:flex;
+    gap:18px;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    padding:12px 22px 26px;
+
+    scroll-behavior:smooth;
+
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+}
+
+.stories-container::-webkit-scrollbar{
+    display:none;
+}
+
+.story-wrapper{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    min-width:78px;
+
+    text-decoration:none;
+}
+
+.story-avatar{
+    width:74px;
+    height:74px;
+
+    padding:3px;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #ffdc80,
+        #fc466b,
+        #8b5cf6
+    );
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    flex-shrink:0;
+}
+
+.story-avatar img{
+    width:100%;
+    height:100%;
+
+    border-radius:50%;
+
+    border:3px solid #090909;
+
+    object-fit:cover;
+
+    display:block;
+}
+
+.story-name{
+    margin-top:8px;
+
+    color:#ffffff;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    text-align:center;
+
+    max-width:76px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.post-gradient{
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    height:180px;
+
+    z-index:2;
+
+    background:linear-gradient(
+        to top,
+        rgba(0,0,0,.88),
+        rgba(0,0,0,.45),
+        transparent
+    );
+
+    pointer-events:none;
+}
+
+.post-media-overlay{
+    position:absolute;
+
+    top:0;
+    left:0;
+    right:0;
+
+    z-index:5;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    padding:20px;
+
+    background:linear-gradient(
+        to bottom,
+        rgba(0,0,0,.70),
+        transparent
+    );
+}
+
+.post-image,
+.post-video{
+    width:100%;
+
+    height:640px;
+
+    object-fit:cover;
+
+    display:block;
+
+    background:#000;
+}
+
+.post-media-wrapper{
+    position:relative;
+
+    overflow:hidden;
+
+    border-radius:34px;
+
+    background:#151515;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.55);
+
+    isolation:isolate;
+}
+
+.feed-card{
+    width:min(100%,640px);
+
+    margin:0 auto 38px;
+
+    padding:0 16px;
+
+    background:transparent;
+
+    border:none;
+
+    overflow:visible;
+}
+.comment-input{
+    flex:1;
+    height:48px;
+    border:none;
+    outline:none;
+    border-radius:999px;
+    background:#1b1b1b;
+    color:#fff;
+    padding:0 20px;
+    font-size:14px;
+}
+
+.comment-input::placeholder{
+    color:#8d8d8d;
+}
+
+.comment-input:focus{
+    background:#242424;
+}
+
+.comment-btn{
+    height:48px;
+    padding:0 24px;
+    border:none;
+    border-radius:999px;
+    background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+    color:#fff;
+    font-weight:700;
+}
+
+.comment-btn:hover{
+    opacity:.95;
+}
+/* --- INSTAGRAM STYLE LIVE RING & BADGE --- */
+.story-avatar.is-live {
+    /* Live stream ke liye ek solid red/pink animation ring */
+    background: #FF3B30;
+    animation: pulseLiveRing 1.5s infinite;
+}
+
+@keyframes pulseLiveRing {
+    0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(255, 59, 48, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+}
+
+.live-badge {
+    position: absolute;
+    bottom: 22px; /* Avatar ke theek neeche set karne ke liye */
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, #E2003D, #FF0055);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 2px solid #000000; /* Black border taaki overlap clean lage */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 10;
 }

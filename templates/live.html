@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoMate Live</title>
+    <style>
+        body { margin: 0; padding: 0; background: #000; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        #root { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
+    
+    <script>
+        const roomID = "{{ room_id }}"; 
+        const userID = "{{ user_id | string }}"; 
+        const userName = "{{ username }}"; 
+
+        // Tumhari details maine yahan daal di hain (Screenshot ke hisaab se)
+        const appID = 22738774; 
+        const serverSecret = "2942cea418cc784129dba05a56494f50"; 
+
+        // Isse tum hamesha Host (Broadcaster) banoge aur tumhara camera on hoga
+        const role = ZegoUIKitPrebuilt.Host;
+
+        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+            appID, serverSecret, roomID, userID, userName
+        );
+
+        const zp = ZegoUIKitPrebuilt.create(kitToken);
+        zp.joinRoom({
+            container: document.querySelector("#root"),
+            scenario: {
+                mode: ZegoUIKitPrebuilt.LiveStreaming,
+                config: {
+                    role: role,
+                },
+            },
+            sharedLinks: [{
+                name: 'Share Live',
+                url: window.location.href,
+            }],
+        });
+    </script>
+</body>
+</html>

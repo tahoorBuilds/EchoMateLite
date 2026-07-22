@@ -3,202 +3,255 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Create Post • EchoMateLite</title>
 
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 <style>
-
-body{
-    background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
-    min-height:100vh;
-    padding-bottom:100px;
+body {
+    margin: 0;
+    padding: 0;
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding-bottom: 120px;
 }
 
-.brand{
-    text-align:center;
-    padding:30px 0;
+.page-container {
+    width: min(100%, 550px);
+    margin: 10px auto 24px;
+    padding: 0 16px;
 }
 
-.brand a{
-    text-decoration:none;
-    color:white;
+.page-header {
+    text-align: center;
+    margin-bottom: 24px;
 }
 
-.brand h1{
-    font-weight:800;
-    margin:0;
+.page-header h2 {
+    font-weight: 800;
+    background: linear-gradient(90deg, #4A3AFF 0%, #FF6B4A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    font-size: 28px;
 }
 
-.brand p{
-    color:#cbd5e1;
+.ui-card {
+    background: #ffffff;
+    border-radius: 36px;
+    padding: 30px 24px;
+    color: #000000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
-.post-card{
-    max-width:700px;
-    margin:auto;
-    background:rgba(255,255,255,.12);
-    backdrop-filter:blur(16px);
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:25px;
-    padding:35px;
-    color:white;
-    box-shadow:0 15px 40px rgba(0,0,0,.25);
+.form-control {
+    background: #F4F4F5;
+    border: none;
+    border-radius: 20px;
+    padding: 16px;
+    font-size: 14px;
+    color: #000;
+    resize: none;
+    font-weight: 500;
 }
 
-.form-control{
-    border-radius:18px;
-    border:none;
-    padding:14px;
+.form-control:focus {
+    box-shadow: none;
+    background: #eef0f2;
 }
 
-.form-control:focus{
-    box-shadow:none;
-    border:2px solid #60a5fa;
+.btn-dark-custom {
+    background: #000;
+    color: #fff;
+    border-radius: 24px;
+    padding: 12px 24px;
+    font-weight: 700;
+    border: none;
+    width: 100%;
 }
 
-textarea{
-    resize:none;
+.btn-outline-custom {
+    border: 1px solid #ddd;
+    color: #000;
+    border-radius: 24px;
+    padding: 12px 24px;
+    font-weight: 700;
+    background: transparent;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    width: 100%;
 }
 
-.btn-post{
-    border-radius:50px;
-    padding:12px 35px;
-    font-weight:bold;
+.preview {
+    display: none;
+    margin-top: 15px;
+    width: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+    max-height: 300px;
 }
 
-.btn-back{
-    border-radius:50px;
-    padding:12px 35px;
-    font-weight:bold;
+/* --- PREMIUM INSTAGRAM STYLE TOAST NOTIFICATION --- */
+.ig-toast {
+    position: fixed;
+    bottom: 90px; /* Bottom nav ke theek upar */
+    left: 50%;
+    transform: translateX(-50%) translateY(30px);
+    background: rgba(38, 38, 38, 0.98);
+    backdrop-filter: blur(10px);
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 10000;
+    width: max-content;
+    max-width: 90%;
 }
 
-.preview{
-    display:none;
-    margin-top:20px;
-    width:100%;
-    border-radius:20px;
+.ig-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
 }
 
+/* --- BOTTOM NAV --- */
+.bottom-nav-container {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    width: min(85%, 320px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px;
+    background: #1C1C1E;
+    border-radius: 40px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+    z-index: 9999;
+}
+.nav-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #8E8E93;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.nav-item.active { background: #ffffff; color: #000000; }
+.nav-icon { font-size: 20px; }
 </style>
-
 </head>
 
 <body>
-
-<div class="container">
-
-<div class="brand">
-
-<a href="/dashboard">
-
-<h1>🚀 EchoMateLite</h1>
-
-</a>
-
-<p>Create something amazing</p>
-
-</div>
-
-<div class="post-card">
-
-<h3 class="mb-4">
-
-✨ Create New Post
-
-</h3>
-
-<form
-method="POST"
-enctype="multipart/form-data">
-
-<div class="mb-3">
-
-<textarea
-name="content"
-rows="6"
-class="form-control"
-placeholder="What's on your mind?"></textarea>
-
-</div>
-
-<div class="mb-4">
-
-<label class="form-label">
-
-📷 Upload Image
-
-</label>
-
-<input
-type="file"
-name="image"
-class="form-control"
-accept="image/*"
-onchange="previewImage(event)">
-
-<img
-id="preview"
-class="preview">
-
-</div>
-
-<div class="d-flex gap-3">
-
-<button
-class="btn btn-primary btn-post">
-
-🚀 Publish
-
-</button>
-
-<a
-href="/dashboard"
-class="btn btn-light btn-back">
-
-← Back
-
-</a>
-
-</div>
-
-</form>
-
-</div>
-
-</div>
-
 {% include "navbar.html" %}
 
+<div class="page-container">
+    <div class="page-header">
+        <a href="/feed" class="text-decoration-none">
+            <h2>EchoMateLite</h2>
+        </a>
+        <p class="text-white-50 mt-1">Create something amazing</p>
+    </div>
+
+    <div class="ui-card">
+        <h5 class="fw-bold mb-4">✨ Create New Post</h5>
+        <form method="POST" enctype="multipart/form-data" onsubmit="return validatePost(event)">
+            <div class="mb-3">
+                <textarea name="content" rows="4" class="form-control" placeholder="What's on your mind?"></textarea>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-muted ms-2">📷 Upload Media</label>
+                <input type="file" name="image" class="form-control" accept="image/*,video/*" onchange="previewImage(event)">
+                <img id="preview" class="preview">
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-dark-custom">🚀 Publish</button>
+                <a href="/feed" class="btn-outline-custom">← Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- PREMIUM TOAST NOTIFICATION HTML -->
+<div id="igToast" class="ig-toast">
+    <i class="bi bi-exclamation-circle-fill text-danger fs-5"></i>
+    <span>Please add text or a photo to post.</span>
+</div>
+
+<!-- BOTTOM NAV (Create Active) -->
+<div class="bottom-nav-container">
+    <a href="/feed" class="nav-item">
+        <i class="bi bi-house-door-fill nav-icon"></i>
+    </a>
+    <a href="/searchuser" class="nav-item">
+        <i class="bi bi-search nav-icon"></i>
+    </a>
+    <a href="/createpost" class="nav-item active">
+        <i class="bi bi-plus-square nav-icon"></i>
+    </a>
+    <a href="/profile" class="nav-item">
+        <i class="bi bi-person-fill nav-icon"></i>
+    </a>
+</div>
+
 <script>
+// TOAST NOTIFICATION FUNCTION
+function showToast() {
+    const toast = document.getElementById('igToast');
+    toast.classList.add('show');
+    
+    // 3 second baad apne aap gayab ho jayega
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
 
+// FORM VALIDATION
+function validatePost(event) {
+    const content = document.querySelector('textarea[name="content"]').value.trim();
+    const media = document.querySelector('input[name="image"]').files.length;
+
+    if (content === "" && media === 0) {
+        event.preventDefault(); // Form ko submit hone se rokna
+        showToast(); // Premium Toast dikhana
+        return false;
+    }
+    return true; 
+}
+
+// IMAGE PREVIEW
 function previewImage(event){
-
-const file=event.target.files[0];
-
-if(file){
-
-const reader=new FileReader();
-
-reader.onload=function(e){
-
-const img=document.getElementById("preview");
-
-img.src=e.target.result;
-
-img.style.display="block";
-
+    const file = event.target.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+            const img = document.getElementById("preview");
+            img.src = e.target.result;
+            img.style.display = "block";
+        }
+        reader.readAsDataURL(file);
+    }
 }
-
-reader.readAsDataURL(file);
-
-}
-
-}
-
 </script>
-
 </body>
 </html>

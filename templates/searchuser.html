@@ -3,157 +3,178 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Search Users • EchoMateLite</title>
 
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 <style>
-
-body{
-    margin:0;
-    min-height:100vh;
-    font-family:'Poppins',sans-serif;
-    background:
-        radial-gradient(circle at top left,rgba(59,130,246,.15),transparent 28%),
-        radial-gradient(circle at bottom right,rgba(6,182,212,.18),transparent 28%),
-        linear-gradient(135deg,#eef5ff 0%,#f8fbff 100%);
-    padding-bottom:100px;
+body {
+    margin: 0;
+    padding: 0;
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding-bottom: 120px;
 }
 
-.page{
-    max-width:700px;
-    margin:40px auto;
-    padding:0 15px;
+.page-container {
+    width: min(100%, 550px);
+    margin: 20px auto 24px;
+    padding: 0 16px;
 }
 
-.logo{
-    text-align:center;
-    margin-bottom:35px;
+.page-header {
+    text-align: center;
+    margin-bottom: 24px;
 }
 
-.logo a{
-    text-decoration:none;
-    color:#1e3a8a;
+.page-header h2 {
+    font-weight: 800;
+    background: linear-gradient(90deg, #4A3AFF 0%, #FF6B4A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    font-size: 28px;
 }
 
-.logo h1{
-    font-weight:800;
-    margin:0;
-    font-size:2.5rem;
-    color:#1e3a8a;
+.ui-card {
+    background: #ffffff;
+    border-radius: 36px;
+    padding: 30px 24px;
+    color: #000000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
-.logo p{
-    color:#64748b;
-    margin-top:8px;
+.form-control {
+    background: #F4F4F5;
+    border: none;
+    border-radius: 20px;
+    padding: 14px 20px;
+    font-size: 14px;
+    color: #000;
 }
 
-.search-card{
-    background:#ffffff;
-    border-radius:30px;
-    padding:35px;
-    border:1px solid #e5e7eb;
-    box-shadow:0 20px 50px rgba(0,0,0,.08);
+.form-control:focus {
+    box-shadow: none;
+    background: #eef0f2;
 }
 
-.form-control{
-    border-radius:18px;
-    padding:15px 18px;
-    border:1px solid #dbeafe;
-    box-shadow:none;
+.btn-search {
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 0 24px;
+    font-weight: 700;
+    font-size: 14px;
 }
 
-.form-control:focus{
-    border-color:#2563eb;
-    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
+/* --- BOTTOM NAV --- */
+.bottom-nav-container {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    width: min(85%, 320px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px;
+    background: #1C1C1E;
+    border-radius: 40px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+    z-index: 9999;
 }
 
-.btn-search{
-    width:100%;
-    border:none;
-    border-radius:50px;
-    padding:15px;
-    font-weight:700;
-    font-size:17px;
-    color:white;
-    background:linear-gradient(135deg,#2563eb,#38bdf8);
-    transition:.25s;
+.nav-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #8E8E93;
+    text-decoration: none;
+    transition: 0.3s;
 }
 
-.btn-search:hover{
-    transform:translateY(-2px);
-    box-shadow:0 12px 30px rgba(37,99,235,.25);
+.nav-item.active { 
+    background: #ffffff; 
+    color: #000000; 
 }
 
-@media(max-width:768px){
-
-.page{
-    margin:20px auto;
+.nav-icon { 
+    font-size: 20px; 
 }
-
-.search-card{
-    padding:24px;
-    border-radius:24px;
-}
-
-}
-
 </style>
-
 </head>
 
 <body>
-
-<div class="page">
-
-<div class="logo">
-
-<h1>🚀 EchoMateLite</h1>
-
-</a>
-
-<p>Find friends and explore profiles</p>
-
-</div>
-
-<div class="search-card">
-
-<h3 class="text-white mb-4">
-
-🔍 Search User
-
-</h3>
-
-<form method="POST">
-
-<div class="input-group">
-
-<input
-type="text"
-name="username"
-class="form-control"
-placeholder="Enter username..."
-required>
-
-<button
-type="submit"
-class="btn btn-primary btn-search px-4">
-
-Search
-
-</button>
-
-</div>
-
-</form>
-
-</div>
-
-</div>
-
 {% include "navbar.html" %}
+
+<div class="page-container">
+    <div class="page-header">
+        <a href="/feed" class="text-decoration-none">
+            <h2>EchoMateLite</h2>
+        </a>
+        <p class="text-white-50 mt-1">Find your friends</p>
+    </div>
+
+    <div class="ui-card">
+        <h5 class="fw-bold mb-4">🔍 Search User</h5>
+        <form action="/searchuser" method="POST">
+            <div class="d-flex gap-2">
+                <input type="text" name="username" class="form-control" placeholder="Enter username..." required autocomplete="off">
+                <button type="submit" class="btn-search">Search</button>
+            </div>
+        </form>
+
+        <!-- SEARCH RESULTS SECTION -->
+        {% if request.method == "POST" %}
+            <hr class="my-4 text-muted">
+            <h6 class="fw-bold mb-3 text-secondary" style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Search Results</h6>
+            
+            {% if users %}
+                <div class="list-group">
+                    {% for u in users %}
+                        <a href="/user/{{ u[0] }}" class="list-group-item list-group-item-action d-flex align-items-center gap-3 border-0 py-2 px-3 mb-2 rounded-3 bg-light text-decoration-none">
+                            <img src="{{ url_for('static', filename='profile_pics/' + (u[2] if u[2] else 'default.png')) }}" 
+                                 class="rounded-circle shadow-sm" width="42" height="42" style="object-fit: cover;">
+                            <div>
+                                <span class="fw-bold text-dark d-block">{{ u[1] }}</span>
+                                <small class="text-muted" style="font-size: 12px;">Tap to view profile</small>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-3">
+                    <p class="text-danger fw-semibold mb-0">User Not Found!</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav-container">
+    <a href="/feed" class="nav-item">
+        <i class="bi bi-house-door-fill nav-icon"></i>
+    </a>
+    <a href="/searchuser" class="nav-item active">
+        <i class="bi bi-search nav-icon"></i>
+    </a>
+    <a href="/createpost" class="nav-item">
+        <i class="bi bi-plus-square nav-icon"></i>
+    </a>
+    <a href="/profile" class="nav-item">
+        <i class="bi bi-person-fill nav-icon"></i>
+    </a>
+</div>
 
 </body>
 </html>

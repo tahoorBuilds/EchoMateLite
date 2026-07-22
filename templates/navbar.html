@@ -1,40 +1,20 @@
-<nav class="bottom-nav">
-
-    <a href="/dashboard" class="nav-item">
-        <span>🏠</span>
-        <small>Home</small>
-    </a>
+<div class="bottom-nav-container">
 
     <a href="/feed" class="nav-item">
-        <span>📰</span>
-        <small>Feed</small>
+        <span class="nav-icon"><i class="bi bi-house-fill"></i></span>
+    </a>
+
+    <a href="/searchpost" class="nav-item">
+        <span class="nav-icon"><i class="bi bi-search"></i></span>
     </a>
 
     <a href="/createpost" class="nav-item">
-        <span>➕</span>
-        <small>Post</small>
+        <span class="nav-icon"><i class="bi bi-plus-circle-fill"></i></span>
     </a>
 
-    <a href="/searchuser" class="nav-item">
-        <span>🔍</span>
-        <small>Search</small>
-    </a>
-
-    <a href="/notifications" class="nav-item">
-        <span>🔔</span>
-        <small>Alerts</small>
-    </a>
-
+    <!-- BAS YAHAN /dashboard KI JAGAH /profile KAR DIYA HAI -->
     <a href="/profile" class="nav-item">
-        <span>👤</span>
-        <small>Profile</small>
+        <span class="nav-icon"><i class="bi bi-person-fill"></i></span>
     </a>
 
-    {% if session.user_id %}
-    <a href="/logout" class="nav-item">
-        <span>🚪</span>
-        <small>Logout</small>
-    </a>
-    {% endif %}
-
-</nav>
+</div>

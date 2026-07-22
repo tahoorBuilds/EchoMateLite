@@ -3,263 +3,428 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>{{ user[1] }} • EchoMateLite</title>
 
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 <style>
+body { margin: 0; padding: 0; background: #000000; color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; padding-bottom: 120px; }
+.navbar { position: sticky; top: 0; z-index: 999; display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: #000000; border: none; }
+.brand-link { text-decoration: none; }
+.brand h2 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(90deg, #4A3AFF 0%, #FF6B4A 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.notify-btn { width: 38px; height: 38px; display: flex; justify-content: center; align-items: center; background: #1C1C1E; border-radius: 50%; color: #ffffff; text-decoration: none; transition: 0.2s; }
+.profile-card { width: min(100%, 550px); margin: 10px auto 24px; padding: 30px 20px; background: #ffffff; border-radius: 36px; color: #000000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.profile-pic { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #1C1C1E; box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin-bottom: 10px; }
+.stats { display: flex; justify-content: center; gap: 30px; margin: 25px 0; }
+.stat-item { text-align: center; color: #111827; }
+.stat-item h3 { margin: 0; font-weight: 800; font-size: 22px; }
+.stat-item small { font-size: 13px; color: #6b7280; font-weight: 600; }
+.btn-dark-custom { background: #000; color: #fff; border-radius: 20px; padding: 10px 24px; font-weight: 700; font-size: 14px; border: none; text-decoration: none; display: inline-block; }
+.btn-outline-danger-custom { border: 2px solid #ff3b30; color: #ff3b30; border-radius: 20px; padding: 8px 24px; font-weight: 700; font-size: 14px; background: transparent; text-decoration: none; display: inline-block; }
 
-body{
-background:linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb);
-min-height:100vh;
-padding-bottom:100px;
+/* FEED MATCHING POST CARDS & OVERLAYS */
+.user-post-card { width: min(100%, 550px); margin: 0 auto 24px; padding: 10px; background: #ffffff; border-radius: 36px; color: #000000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.post-media-wrapper { position: relative; width: 100%; border-radius: 28px; overflow: hidden; background: #181818; cursor: pointer; user-select: none; }
+.post-image, .post-video { width: 100%; height: 480px; display: block; object-fit: cover; }
+
+/* INSTAGRAM DOUBLE TAP HEART ANIMATION */
+.double-tap-heart {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    color: #ff3b30; font-size: 80px; z-index: 10;
+    pointer-events: none; transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    opacity: 0; text-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
+.double-tap-heart.animate { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+.double-tap-heart.fade-out { transform: translate(-50%, -50%) scale(1); opacity: 0; }
 
-.profile-card{
-max-width:900px;
-margin:40px auto;
-background:rgba(255,255,255,.12);
-backdrop-filter:blur(18px);
-border-radius:25px;
-padding:35px;
-color:white;
-box-shadow:0 15px 40px rgba(0,0,0,.25);
-}
+.overlay-bottom-left { position: absolute; bottom: 16px; left: 16px; z-index: 2; display: flex; gap: 10px; }
+.stat-pill { display: flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 8px 16px; border-radius: 30px; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.15); transition: 0.2s ease; }
+.stat-pill:hover { background: rgba(0, 0, 0, 0.8); color: #fff; }
+.stat-pill i { font-size: 15px; }
+.bi-heart-fill { color: #FF3B30 !important; }
 
-.logo{
-text-align:center;
-margin-bottom:25px;
-}
+.stat-pill-light { background: #f4f4f5; color: #000000; border: none; }
+.stat-pill-light:hover { background: #e4e4e7; color: #000; }
 
-.logo a{
-text-decoration:none;
-color:white;
-}
+.caption-area { padding: 16px 8px 8px 8px; display: flex; align-items: flex-start; gap: 12px; }
+.caption-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.caption-content { flex-grow: 1; }
+.caption-username { font-size: 14px; font-weight: 700; color: #000000; margin-bottom: 4px; display: block; }
+.caption-text { font-size: 13px; line-height: 1.5; color: #333333; margin: 0 0 10px 0; }
+.comments-list { margin-top: 10px; max-height: 150px; overflow-y: auto; border-left: 2px solid #f0f0f0; padding-left: 10px; }
+.comment-form { display: flex; gap: 8px; margin-top: 12px; }
 
-.logo h1{
-font-weight:800;
-margin:0;
-}
+.share-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1050; }
+.share-modal { background: #ffffff; width: 90%; max-width: 400px; border-radius: 24px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); color: #000; }
+.share-user-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+.btn-send-dm { background: #000; color: white; border: none; padding: 6px 20px; border-radius: 20px; font-weight: 600; font-size: 13px; text-decoration: none; transition: 0.2s; }
+.btn-send-dm:hover { background: #333; color: white; }
 
-.avatar{
-width:140px;
-height:140px;
-border-radius:50%;
-object-fit:cover;
-border:5px solid white;
-margin-bottom:15px;
-}
-
-.stats{
-display:flex;
-justify-content:center;
-gap:45px;
-margin:25px 0;
-text-align:center;
-}
-
-.stats h3{
-margin:0;
-font-weight:700;
-}
-
-.post-card{
-background:white;
-color:#111827;
-border-radius:18px;
-padding:20px;
-margin-top:20px;
-box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-
-.post-card img{
-width:100%;
-border-radius:15px;
-margin-top:12px;
-}
-
-.action-btn{
-border-radius:50px;
-padding:12px 30px;
-font-weight:bold;
-}
-
+.bottom-nav-container { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); width: min(85%, 320px); display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; background: #1C1C1E; border-radius: 40px; box-shadow: 0 15px 45px rgba(0,0,0,0.6); z-index: 9999; }
+.nav-item { display: flex; justify-content: center; align-items: center; width: 44px; height: 44px; border-radius: 50%; color: #8E8E93; text-decoration: none; transition: 0.3s; }
+.nav-item.active { background: #ffffff; color: #000000; }
+.nav-icon { font-size: 20px; }
 </style>
-
 </head>
 
 <body>
 
-<div class="profile-card">
+<nav class="navbar">
+    <a href="/feed" class="brand-link">
+        <div class="brand"><h2>EchoMateLite</h2></div>
+    </a>
+    <div>
+        <a href="/notifications" class="notify-btn"><i class="bi bi-bell-fill"></i></a>
+    </div>
+</nav>
 
-<div class="logo">
-
-<a href="/dashboard">
-
-<h1>🚀 EchoMateLite</h1>
-
-</a>
-
+<div class="share-modal-overlay" id="shareModal">
+    <div class="share-modal">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Share to...</h5>
+            <button type="button" class="btn-close" onclick="document.getElementById('shareModal').style.display='none'"></button>
+        </div>
+        <div id="shareUsersList" style="max-height: 350px; overflow-y: auto;">
+            {% for u in all_users %}
+            <div class="share-user-item">
+                <span class="fw-bold">@{{ u[1] }}</span>
+              <a href="javascript:void(0);" id="send-btn-{{ u[0] }}" class="btn-send-dm" onclick="sendPostInDM('{{ u[0] }}', this);">Send</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
-<div class="text-center">
+<div class="container-fluid mt-2 p-0">
+    <div class="profile-card">
+        
+        <div class="text-center">
+            {% if user[3] and user[3] != 'None' %}
+            <img src="{{ url_for('static', filename='profile_pics/' + user[3]) }}" class="profile-pic" onerror="this.src='https://ui-avatars.com/api/?name={{ user[1] }}'">
+            {% else %}
+            <img src="https://ui-avatars.com/api/?name={{ user[1] }}" class="profile-pic">
+            {% endif %}
 
-{% if user[3] %}
+            <h3 class="mt-2 fw-bold text-dark">{{ user[1] }}</h3>
+            
+            {% if user[2] and user[2] != 'None' %}
+                {% set seconds=(now-user[2]).total_seconds() if now else 999 %}
+                {% if seconds < 300 %}
+                    <p class="text-success fw-bold mb-0" style="font-size: 13px;">🟢 Online</p>
+                {% else %}
+                    <p class="text-muted fw-semibold mb-0" style="font-size: 13px;">⚫ Last seen recently</p>
+                {% endif %}
+            {% endif %}
+        </div>
 
-<img
-src="{{ url_for('static', filename='profile_pics/' + user[3]) }}"
-class="avatar">
+        <div class="stats">
+            <a href="#user-posts-section" style="text-decoration: none; color: inherit;">
+                <div class="stat-item">
+                    <h3>{{ posts|length }}</h3><small>Posts</small>
+                </div>
+            </a>
+            <a href="/followers/{{ user[0] }}" style="text-decoration: none; color: inherit;">
+                <div class="stat-item">
+                    <h3>{{ followers_count }}</h3><small>Followers</small>
+                </div>
+            </a>
+            <a href="/following/{{ user[0] }}" style="text-decoration: none; color: inherit;">
+                <div class="stat-item">
+                    <h3>{{ following_count }}</h3><small>Following</small>
+                </div>
+            </a>
+        </div>
 
-{% else %}
+        <div class="text-center mb-4 d-flex justify-content-center gap-2">
+            {% if is_following %}
+                <a href="/unfollow/{{ user[0] }}" class="btn-outline-danger-custom">➖ Unfollow</a>
+                <a href="/sendmessage/{{ user[0] }}" class="btn-dark-custom">💬 Message</a>
+            {% else %}
+                <a href="/follow/{{ user[0] }}" class="btn-dark-custom" style="background: #2563eb;">➕ Follow</a>
+                <a href="/sendmessage/{{ user[0] }}" class="btn-dark-custom">💬 Message</a>
+            {% endif %}
+        </div>
 
-<img
-src="https://ui-avatars.com/api/?name={{ user[1] }}"
-class="avatar">
+        <hr class="text-muted opacity-25 my-4">
+        <h5 id="user-posts-section" class="fw-bold text-center mb-4">📝 User Posts</h5>
 
-{% endif %}
+        <!-- POST LOOP -->
+        {% for post in posts %}
+        <div class="user-post-card" id="post-{{ post[0] }}">
+            
+            {% if post[2] %}
+            <div class="post-media-wrapper" onclick="handleMediaTap('{{ post[0] }}', event)">
+                <i class="bi bi-heart-fill double-tap-heart" id="big-heart-{{ post[0] }}"></i>
 
-<h2>{{ user[1] }}</h2>
+                <div class="overlay-bottom-left">
+                   <a href="javascript:void(0);" onclick="handleLike('{{ post[0] }}', this); event.stopPropagation();" class="stat-pill">
+                        <i id="heart-{{ post[0] }}" class="bi {% if post[4] %}bi-heart-fill text-danger{% else %}bi-heart{% endif %}"></i>
+                        <span id="likes-count-{{ post[0] }}">{{ post[3] }}</span>
+                    </a>
+                    <a href="javascript:void(0);" onclick="let cs = document.getElementById('comment-section-{{ post[0] }}'); cs.style.display = cs.style.display === 'none' ? 'block' : 'none'; event.stopPropagation();" class="stat-pill">
+                        <i class="bi bi-chat-fill"></i>
+                        <span id="comment-count-pill-{{ post[0] }}">{{ all_comments.get(post[0], [])|length if all_comments is defined else 0 }}</span>
+                    </a>
+                    <a href="javascript:void(0);" onclick="openShareModal('{{ post[0] }}'); event.stopPropagation();" class="stat-pill">
+                        <i class="bi bi-send"></i>
+                    </a>
+                </div>
+                
+                {% set fname = post[2] | string | lower %}
+                {% if fname.endswith('.mp4') or fname.endswith('.mov') or fname.endswith('.webm') %}
+                    <video src="{{ url_for('static', filename='post_images/' + post[2]) }}" class="post-video" controls playsinline></video>
+                {% else %}
+                    <img src="{{ url_for('static', filename='post_images/' + post[2]) }}" class="post-image" alt="Post">
+                {% endif %}
+            </div>
+            {% endif %}
 
-{% if user[2] %}
+            <div class="caption-area">
+                {% if user[3] and user[3] != 'None' %}
+                    <img src="{{ url_for('static', filename='profile_pics/' + user[3]) }}" class="caption-avatar" onerror="this.src='https://ui-avatars.com/api/?name={{ user[1] }}'">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ user[1] }}" class="caption-avatar">
+                {% endif %}
+                
+                <div class="caption-content">
+                    <span class="caption-username">{{ user[1] }}</span>
+                    <p class="caption-text">{{ post[1] }}</p>
 
-{% set seconds=(now-user[2]).total_seconds() %}
+                    {% if not post[2] %}
+                    <div class="d-flex gap-2 mb-2 mt-1">
+                        <a href="javascript:void(0);" onclick="handleLike('{{ post[0] }}', this)" class="stat-pill stat-pill-light">
+                            <i id="heart-{{ post[0] }}" class="bi {% if post[4] %}bi-heart-fill text-danger{% else %}bi-heart{% endif %}"></i>
+                            <span id="likes-count-{{ post[0] }}">{{ post[3] }}</span>
+                        </a>
+                        <a href="javascript:void(0);" onclick="let cs = document.getElementById('comment-section-{{ post[0] }}'); cs.style.display = cs.style.display === 'none' ? 'block' : 'none';" class="stat-pill stat-pill-light">
+                            <i class="bi bi-chat-fill"></i>
+                            <span id="comment-count-txt-{{ post[0] }}">{{ all_comments.get(post[0], [])|length if all_comments is defined else 0 }}</span>
+                        </a>
+                        <a href="javascript:void(0);" onclick="openShareModal('{{ post[0] }}')" class="stat-pill stat-pill-light">
+                            <i class="bi bi-send"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <div id="comment-section-{{ post[0] }}" style="display: none;" class="mt-3">
+                        <hr class="text-muted opacity-25 my-2">
+                        
+                        <div class="comments-list mb-3" id="comments-list-{{ post[0] }}" style="max-height: 200px; overflow-y: auto;">
+                            {% if all_comments is defined %}
+                                {% for comment in all_comments.get(post[0], []) %}
+                                <div class="d-flex justify-content-between align-items-start mb-2" id="comment-{{ comment[2] }}">
+                                    <div>
+                                        <strong style="font-size: 13px; color: #000;">{{ comment[1] }}</strong>
+                                        <span class="ms-1" style="font-size: 13px; color: #666;">{{ comment[0] }}</span>
+                                    </div>
+                                    {% if comment[3] == session.get("user_id") %}
+                                    <a href="javascript:void(0);" onclick="deleteComment('{{ comment[2] }}', '{{ post[0] }}')" class="text-danger opacity-75 text-decoration-none ms-2">
+                                        <i class="bi bi-x" style="font-size: 16px;"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+        
+                       <!-- NAYA: form action ko onsubmit se replace kiya gaya hai AJAX ke liye -->
+                       <form onsubmit="submitComment(event, '{{ post[0] }}')" class="d-flex gap-2 comment-form">
+                           <input type="text" id="comment-input-{{ post[0] }}" name="comment" placeholder="Write a comment..." required autocomplete="off" style="background: #F4F4F5; border: none; border-radius: 20px; padding: 8px 16px; flex-grow: 1; outline: none; font-size: 13px; color: #000;">
+                           <button type="submit" class="btn btn-dark rounded-pill btn-sm px-3 fw-bold" style="background: #000; border: none; color: #fff;">Post</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-{% if seconds<300 %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted my-4"><p>📭 No posts yet.</p></div>
+        {% endfor %}
 
-<p class="text-success fw-bold">
-
-🟢 Online
-
-</p>
-
-{% else %}
-
-<p class="text-light">
-
-⚫ Last seen recently
-
-</p>
-
-{% endif %}
-
-{% endif %}
-
+    </div>
 </div>
 
-<div class="stats">
-
-<div>
-
-<h3>{{ posts|length }}</h3>
-
-<small>Posts</small>
-
+<div class="bottom-nav-container">
+    <a href="/feed" class="nav-item"><i class="bi bi-house-door-fill nav-icon"></i></a>
+    <a href="/searchuser" class="nav-item"><i class="bi bi-search nav-icon"></i></a>
+    <a href="/createpost" class="nav-item"><i class="bi bi-plus-square nav-icon"></i></a>
+    <a href="/profile" class="nav-item"><i class="bi bi-person-fill nav-icon"></i></a>
 </div>
 
-<div>
+<!-- JAVASCRIPT LOGIC -->
+<script>
+let isLikeProcessing = false;
+let activeSharePostId = null;
+let lastTapTime = 0;
 
-<h3>{{ followers_count }}</h3>
+// LIKE FUNCTION
+async function handleLike(postId, btnElement) {
+    if (isLikeProcessing) return;
+    isLikeProcessing = true;
+    try {
+        const response = await fetch('/like/' + postId);
+        const data = await response.json();
+        if (data.success) {
+            const icon = btnElement.querySelector('i') || document.getElementById('heart-' + postId);
+            const countSpan = document.getElementById('likes-count-' + postId);
+            if (data.liked) {
+                if(icon) { icon.classList.remove('bi-heart'); icon.classList.add('bi-heart-fill', 'text-danger'); }
+            } else {
+                if(icon) { icon.classList.remove('bi-heart-fill', 'text-danger'); icon.classList.add('bi-heart'); }
+            }
+            if(countSpan) { countSpan.innerText = data.likes; }
+        }
+    } catch (error) { console.error("Like error:", error); } 
+    finally { setTimeout(() => { isLikeProcessing = false; }, 300); }
+}
 
-<small>Followers</small>
+// DOUBLE TAP LOGIC
+function handleMediaTap(postId, event) {
+    if (event.target.closest('.overlay-bottom-left') || event.target.tagName === 'VIDEO') return;
+    let currentTime = new Date().getTime();
+    let tapInterval = currentTime - lastTapTime;
+    if (tapInterval < 300 && tapInterval > 0) {
+        triggerLikeByDoubleTap(postId);
+        showBigHeartAnimation(postId);
+    }
+    lastTapTime = currentTime;
+}
 
-</div>
+async function triggerLikeByDoubleTap(postId) {
+    try {
+        const response = await fetch('/like/' + postId);
+        const data = await response.json();
+        if (data.success) {
+            const heartIcon = document.getElementById('heart-' + postId);
+            const countSpan = document.getElementById('likes-count-' + postId);
+            if (data.liked && heartIcon) {
+                heartIcon.classList.remove('bi-heart'); heartIcon.classList.add('bi-heart-fill', 'text-danger');
+            } else if (heartIcon) {
+                heartIcon.classList.remove('bi-heart-fill', 'text-danger'); heartIcon.classList.add('bi-heart');
+            }
+            if (countSpan) { countSpan.innerText = data.likes; }
+        }
+    } catch (error) { console.error("Double tap like error:", error); }
+}
 
-<div>
+function showBigHeartAnimation(postId) {
+    const bigHeart = document.getElementById('big-heart-' + postId);
+    if (!bigHeart) return;
+    bigHeart.classList.add('animate');
+    setTimeout(() => { bigHeart.classList.remove('animate'); bigHeart.classList.add('fade-out'); }, 400);
+    setTimeout(() => { bigHeart.classList.remove('fade-out'); }, 800);
+}
 
-<h3>{{ following_count }}</h3>
+// SHARE MODAL LOGIC
+function openShareModal(postId) {
+    activeSharePostId = postId;
+    document.getElementById('shareModal').style.display = 'flex';
+}
 
-<small>Following</small>
+async function sendPostInDM(receiverId, btnElement) {
+    if (!activeSharePostId) return;
+    btnElement.innerText = "Sending...";
+    btnElement.style.pointerEvents = "none";
+    try {
+        const response = await fetch('/share_post_to_user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ receiver_id: receiverId, post_id: activeSharePostId })
+        });
+        const data = await response.json();
+        if (data.success) {
+            btnElement.innerText = "Sent! ✅";
+            btnElement.style.backgroundColor = "#22c55e";
+            setTimeout(() => {
+                btnElement.innerText = "Send";
+                btnElement.style.backgroundColor = "#000";
+                btnElement.style.pointerEvents = "auto";
+                document.getElementById('shareModal').style.display = 'none';
+            }, 1000);
+        } else { btnElement.innerText = "Failed"; btnElement.style.pointerEvents = "auto"; }
+    } catch (error) {
+        console.error("Share error:", error);
+        btnElement.innerText = "Error"; btnElement.style.pointerEvents = "auto";
+    }
+}
 
-</div>
+// NAYA: AJAX COMMENT SUBMIT FUNCTION
+async function submitComment(event, postId) {
+    event.preventDefault(); // Page refresh rokne ke liye
+    const inputField = document.getElementById('comment-input-' + postId);
+    const commentText = inputField.value;
+    
+    if (commentText.trim() === '') return;
 
-</div>
+    try {
+        const response = await fetch('/comment/' + postId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ 'comment': commentText })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Naya comment list me turant show karein
+            const commentsList = document.getElementById('comments-list-' + postId);
+            const newCommentHTML = `
+                <div class="d-flex justify-content-between align-items-start mb-2" id="comment-${data.comment_id}">
+                    <div>
+                        <strong style="font-size: 13px; color: #000;">${data.username}</strong>
+                        <span class="ms-1" style="font-size: 13px; color: #666;">${data.comment}</span>
+                    </div>
+                    <a href="javascript:void(0);" onclick="deleteComment('${data.comment_id}', '${postId}')" class="text-danger opacity-75 text-decoration-none ms-2">
+                        <i class="bi bi-x" style="font-size: 16px;"></i>
+                    </a>
+                </div>
+            `;
+            // List ke bottom mein add karein
+            commentsList.insertAdjacentHTML('beforeend', newCommentHTML);
+            
+            // Input field ko khali kar do
+            inputField.value = '';
+            
+            // Comment count update karein (for both overlay and text-only buttons)
+            let countEl = document.getElementById('comment-count-pill-' + postId) || document.getElementById('comment-count-txt-' + postId);
+            if (countEl) {
+                countEl.innerText = parseInt(countEl.innerText) + 1;
+            }
+        }
+    } catch (error) {
+        console.error("Comment submit error:", error);
+    }
+}
 
-<div class="text-center mb-4">
-
-{% if is_following %}
-
-<a
-href="/unfollow/{{ user[0] }}"
-class="btn btn-danger action-btn">
-
-➖ Unfollow
-
-</a>
-
-{% else %}
-
-<a
-href="/follow/{{ user[0] }}"
-class="btn btn-success action-btn">
-
-➕ Follow
-
-</a>
-
-<a
-href="/sendmessage/{{ user[0] }}"
-class="btn btn-primary action-btn">
-
-💬 Message
-
-</a>
-
-{% endif %}
-
-</div>
-
-<h3 class="mb-3">
-
-Posts
-
-</h3>
-
-{% for post in posts %}
-
-<div class="post-card">
-
-<p>
-
-{{ post[1] }}
-
-</p>
-
-{% if post[2] %}
-
-<img
-src="{{ url_for('static', filename='post_images/' + post[2]) }}">
-
-{% endif %}
-
-</div>
-
-{% else %}
-
-<div class="alert alert-light">
-
-No posts yet.
-
-</div>
-
-{% endfor %}
-
-<div class="text-center mt-5">
-
-<a
-href="/dashboard"
-class="btn btn-light rounded-pill px-5">
-
-🏠 Dashboard
-
-</a>
-
-</div>
-
-</div>
-
-{% include "navbar.html" %}
-
+// NAYA: AJAX DELETE COMMENT FUNCTION
+async function deleteComment(commentId, postId) {
+    try {
+        const response = await fetch('/deletecomment/' + commentId + '/' + postId);
+        const data = await response.json();
+        
+        if (data.success) {
+            // Screen se comment hatao
+            const commentDiv = document.getElementById('comment-' + commentId);
+            if (commentDiv) {
+                commentDiv.remove();
+            }
+            
+            // Comment count kam karein
+            let countEl = document.getElementById('comment-count-pill-' + postId) || document.getElementById('comment-count-txt-' + postId);
+            if (countEl) {
+                let currentCount = parseInt(countEl.innerText);
+                countEl.innerText = currentCount > 0 ? currentCount - 1 : 0;
+            }
+        }
+    } catch (error) {
+        console.error("Delete comment error:", error);
+    }
+}
+</script>
 </body>
 </html>
