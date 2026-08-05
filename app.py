@@ -28,9 +28,9 @@ os.makedirs(POST_FOLDER, exist_ok=True)
 
 try:
     db = mysql.connector.connect(
-        host="localhost",
-        user="echo",
-        password="echo123",
+        host="db",           # <-- Docker service ka naam
+        user="echo",         # <-- Compose file wala user
+        password="echo123",  # <-- Compose file wala password
         database="echomatelite"
     )
     cursor = db.cursor(buffered=True)
@@ -1271,4 +1271,4 @@ def watch_live(room_id):
     return render_template('live.html', room_id=room_id, user_id=user_id, username=username)
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8080)
+    app.run(debug=True, host="0.0.0.0", port=8000)
