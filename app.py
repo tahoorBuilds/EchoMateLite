@@ -6,6 +6,46 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from s3_helper import upload_file_to_s3
 
+# 1. Define allowed format groups
+ALLOWED_IMAGES = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
+ALLOWED_VIDEOS = {'.mp4', '.mov', '.avi', '.mkv', '.webm'}
+
+# 2. Initialize App FIRST
+app = Flask(__name__)
+app.secret_key = "echomatelite_secret_key"
+
+# 3. Setup Folders & Configs
+UPLOAD_FOLDER = os.path.join(
+    app.root_path,
+    "static",
+    "profile_pics"
+)
+
+POST_FOLDER = os.path.join(app.root_path, "static", "post_images")
+app.config["POST_FOLDER"] = POST_FOLDER
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# Ye line folders auto-create karegi agar wo nahi hain
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(POST_FOLDER, exist_ok=True)
+
+# 4. Database Connection
+try:
+    db = mysql.connector.connect(
+        host="db",           # <-- Docker service ka naam
+        user="echo",         # <-- Compose file wala user
+        password="echo123",  # <-- Compose file wala password
+        database="echomatelite"
+    )
+    cursor = db.cursor(buffered=True)
+    print("✅ Database Connected Successfully!")
+except mysql.connector.Error as err:
+    print(f"❌ Database Connection Error: {err}")
+    db = None
+    cursor = None
+
+
+# 5. TEST ROUTE YAHAN AAYEGA
 @app.route('/test-upload', methods=['GET', 'POST'])
 def test_upload():
     if request.method == 'POST':
@@ -34,41 +74,7 @@ def test_upload():
     </form>
     '''
 
-# Define allowed format groups
-ALLOWED_IMAGES = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
-ALLOWED_VIDEOS = {'.mp4', '.mov', '.avi', '.mkv', '.webm'}
-
-app = Flask(__name__)
-app.secret_key = "echomatelite_secret_key"
-
-UPLOAD_FOLDER = os.path.join(
-    app.root_path,
-    "static",
-    "profile_pics"
-)
-
-POST_FOLDER = os.path.join(app.root_path, "static", "post_images")
-app.config["POST_FOLDER"] = POST_FOLDER
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-# Ye line folders auto-create karegi agar wo nahi hain
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(POST_FOLDER, exist_ok=True)
-
-try:
-    db = mysql.connector.connect(
-        host="db",           # <-- Docker service ka naam
-        user="echo",         # <-- Compose file wala user
-        password="echo123",  # <-- Compose file wala password
-        database="echomatelite"
-    )
-    cursor = db.cursor(buffered=True)
-    print("✅ Database Connected Successfully!")
-except mysql.connector.Error as err:
-    print(f"❌ Database Connection Error: {err}")
-    db = None
-    cursor = None
-
+# 👇 ISKE NICHE AAPKE BAAKI KE SABHI ROUTES AAYENGE (Home, Login, Dashboard, etc.) 👇
 # Home Page
 @app.route("/")
 def home():
