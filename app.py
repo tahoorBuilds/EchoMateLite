@@ -4,6 +4,35 @@ from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from s3_helper import upload_file_to_s3
+
+@app.route('/test-upload', methods=['GET', 'POST'])
+def test_upload():
+    if request.method == 'POST':
+        # Form se aayi hui file ko pakadna
+        if 'file' not in request.files:
+            return "Koi file nahi mili!"
+            
+        file = request.files['file']
+        
+        if file.filename != '':
+            # Apne s3_helper wale function ko call karna
+            file_url = upload_file_to_s3(file, file.filename)
+            
+            if file_url:
+                return f"<h3>Success! 🚀</h3> File cloud par live hai: <a href='{file_url}' target='_blank'>{file_url}</a>"
+            else:
+                return "Upload fail ho gaya, terminal logs check karo."
+            
+    # GET request par ek simple sa HTML form dikhana
+    return '''
+    <h2>AWS S3 Upload Test</h2>
+    <form method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <br><br>
+      <input type="submit" value="Upload to AWS S3">
+    </form>
+    '''
 
 # Define allowed format groups
 ALLOWED_IMAGES = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
